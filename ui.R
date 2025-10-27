@@ -8,11 +8,11 @@ navbarPage(
     "Home Page", 
     fluidPage(
       div(style = "text-align: center;",
-        tags$img(src = "bigfoot-landing-page.jpg", width = "900px"),
-        tags$h1("Welcome to Bigfoot Sightings"),
-        tags$h2("Have you ever wondered where Bigfoot has been found? 
+          tags$img(src = "bigfoot-landing-page.jpg", width = "900px"),
+          tags$h1("Welcome to Bigfoot Sightings"),
+          tags$h2("Have you ever wondered where Bigfoot has been found? 
         Want to know where to look next? Well, you've come to the right place!")), 
-
+      
       tags$head(
         tags$style(HTML("
       @keyframes slide {
