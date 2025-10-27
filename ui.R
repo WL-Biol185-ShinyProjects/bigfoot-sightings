@@ -12,7 +12,7 @@ navbarPage(
         tags$h1("Welcome to Bigfoot Sightings"),
         tags$h2("Have you ever wondered where Bigfoot has been found? 
         Want to know where to look next? Well, you've come to the right place!")), 
-      
+
       tags$head(
         tags$style(HTML("
       @keyframes slide {
@@ -41,12 +41,13 @@ navbarPage(
       
       
       tags$img(id = "moving-image", 
-               src = "bigfoot-image.webp",
+               src = "new-bigfoot-image-removebg-preview.png",
                width = "300px"),
       
       
       # website: https://pixabay.com/sound-effects/search/bigfoot/
-      
+      # https://en.wikipedia.org/wiki/Bigfoot
+      # https://www.shutterstock.com/search/big-foot-creature
     )
     
     

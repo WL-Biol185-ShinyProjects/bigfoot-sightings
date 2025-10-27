@@ -23,13 +23,13 @@ function(input, output) {
                             paste( words[ !words %in% removed_words], collapse = " ")
                           })
     #This code created list of words that will show up on the wordcloud
-    
+    par(bg = NA)
     
     wordcloud(kept_words, 
               colors = brewer.pal(8, "Dark2"),
               max.words = input$max_words
     )
-  }, height = 600)
+  }, height = 600, bg = "transparent")
   
   
   
