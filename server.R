@@ -6,7 +6,8 @@ library(memoise)
 library(tidyverse)
 library(stringr)
 library(ggplot2)
-
+library(readxl)
+bigfoot_observations <- read_excel("bigfoot_observation.xlsx")
 
 
 
@@ -203,7 +204,14 @@ function(input, output, session) {
           minOpacity = 0.3  # Added minimum opacity for better visibility
         )
     } else if(input$view_mode == "cluster" && nrow(data) > 0) {
-      leafletProxy("map", data = data) %>%
+      # Merge observation data
+      data_with_obs <- data %>%
+        left_join(bigfoot_observations %>% 
+                    select(latitude, longitude, state, county, observed = observation),
+                  by = c("lat" = "latitude", "long" = "longitude")) %>%
+        mutate(marker_id = paste0("marker_", seq_len(n())))
+      
+      leafletProxy("map", data = data_with_obs) %>%
         addCircleMarkers(
           lng = ~long,
           lat = ~lat,
@@ -212,17 +220,28 @@ function(input, output, session) {
           fillOpacity = 0.6,
           stroke = TRUE,
           weight = 1,
+          layerId = ~marker_id,
           clusterOptions = markerClusterOptions(
             showCoverageOnHover = FALSE,
             zoomToBoundsOnClick = TRUE
           ),
           popup = ~paste0(
             "<b>Date:</b> ", date, "<br>",
-            "<b>Location:</b> ", round(lat, 4), ", ", round(long, 4)
+            "<b>State:</b> ", state, "<br>",
+            "<b>County:</b> ", county, "<br>",
+            "<b>Observation:</b> ", observed, "<br>",
+            "<button onclick='speakText(\"", gsub("\"", "&quot;", observed), "\")' style='margin-top: 10px; padding: 5px 10px; background-color: #ff6b6b; color: white; border: none; border-radius: 5px; cursor: pointer;'>🔊 Hear in Appalachian Accent</button>"
           )
         )
     } else if(input$view_mode == "circles" && nrow(data) > 0) {
-      leafletProxy("map", data = data) %>%
+      # Merge observation data
+      data_with_obs <- data %>%
+        left_join(bigfoot_observations %>% 
+                    select(latitude, longitude, state, county, observed = observation),
+                  by = c("lat" = "latitude", "long" = "longitude")) %>%
+        mutate(marker_id = paste0("marker_", seq_len(n())))
+      
+      leafletProxy("map", data = data_with_obs) %>%
         addCircleMarkers(
           lng = ~long,
           lat = ~lat,
@@ -233,10 +252,14 @@ function(input, output, session) {
           stroke = TRUE,
           weight = 1,
           opacity = 0.8,
+          layerId = ~marker_id,
           popup = ~paste0(
             "<b>Date:</b> ", date, "<br>",
             "<b>Year:</b> ", year, "<br>",
-            "<b>Location:</b> ", round(lat, 4), ", ", round(long, 4)
+            "<b>State:</b> ", state, "<br>",
+            "<b>County:</b> ", county, "<br>",
+            "<b>Observation:</b> ", observed, "<br>",
+            "<button onclick='speakText(\"", gsub("\"", "&quot;", observed), "\")' style='margin-top: 10px; padding: 5px 10px; background-color: #ff6b6b; color: white; border: none; border-radius: 5px; cursor: pointer;'>🔊 Hear in Appalachian Accent</button>"
           )
         )
     }
