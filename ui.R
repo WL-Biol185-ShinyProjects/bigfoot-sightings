@@ -86,7 +86,10 @@ navbarPage(
              h3("Multiple Visualizations of Bigfoot Sightings"), 
              selectInput("plotChoice" , "Choose a Plot:",
                          choices = c("Sightings by Season", "Sightings by State", "Sightings by Temperature")),
-             plotOutput("selectedPlot")
+             hr(),
+             h4("Click and drag on the top of any bar to see details"),
+             verbatimTextOutput("info"),
+             plotOutput("selectedPlot", brush = "plot_click")
            )#fluidpage for visualizations page
            
   ),#Tabpanel for visualizations page

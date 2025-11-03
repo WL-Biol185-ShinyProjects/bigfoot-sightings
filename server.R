@@ -49,6 +49,24 @@ function(input, output, session) {
       tempgrouped_bar
     }
   })
+  output$info <- renderText({
+    print(input$plotChoice)
+    if (is.null(input$plot_click)) {
+      return("Click on a bar to see the number of observations")
+    }
+    if(input$plotChoice == "Sightings by Season") {
+      seasontable <- brushedPoints(bigfoot_season, input$plot_click)
+      paste(seasontable$n)
+    }
+    else if(input$plotChoice == "Sightings by State") {
+      statetable <- brushedPoints(number_sightings_per_state, input$plot_click)
+      paste(statetable$n)
+    }
+    else if(input$plotChoice == "Sightings by Temperature") {
+      temptable <- brushedPoints(temp_summary, input$plot_click)
+      paste(temptable$n)
+    }
+    })
   
   # Load and prepare data with SF
   bigfoot_sf <- reactive({
