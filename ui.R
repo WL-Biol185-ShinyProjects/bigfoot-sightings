@@ -64,6 +64,8 @@ navbarPage(
              theme = shinytheme("darkly"),
              plotOutput("WordCloud", height = "auto"),
              
+             hr(),
+             
              sidebarLayout(
                sidebarPanel(
                  sliderInput("max_words",
@@ -171,7 +173,7 @@ navbarPage(
   )
            )#fluid page for heat map
            ),#tab panel for heat map
-  tabPanel("Moon Phase Tracker for BigFoot Sightings",
+  tabPanel("Moon Phase Tracker for Bigfoot Sightings",
            fluidPage(
              tags$head(
                tags$style(HTML("
