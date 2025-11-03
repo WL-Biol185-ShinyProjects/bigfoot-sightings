@@ -5,6 +5,8 @@ bigfoot_data <- read.csv("bigfoot_data.csv")
 bigfoot_season <- bigfoot_data %>%
   count(season)
 
+bigfoot_season$season <- factor(bigfoot_season$season)
+
 season_bar <- ggplot(bigfoot_season, aes(season, n)) + geom_col(fill = "#0047AB")          + 
   labs(title = "Number of Bigfoot Sightings Per Season")                + 
   xlab("Season") + ylab("Sightings")                                    +
