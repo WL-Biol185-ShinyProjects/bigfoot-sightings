@@ -231,8 +231,7 @@ function(input, output, session) {
             "<b>Date:</b> ", date, "<br>",
             "<b>State:</b> ", state, "<br>",
             "<b>County:</b> ", county, "<br>",
-            "<b>Observation:</b> ", observed, "<br>",
-            "<button onclick='speakText(\"", gsub("\"", "&quot;", observed), "\")' style='margin-top: 10px; padding: 5px 10px; background-color: #ff6b6b; color: white; border: none; border-radius: 5px; cursor: pointer;'>🔊 Hear in Appalachian Accent</button>"
+            "<b>Observation:</b> ", observed 
           )
         )
     } else if(input$view_mode == "circles" && nrow(data) > 0) {
@@ -260,8 +259,7 @@ function(input, output, session) {
             "<b>Year:</b> ", year, "<br>",
             "<b>State:</b> ", state, "<br>",
             "<b>County:</b> ", county, "<br>",
-            "<b>Observation:</b> ", observed, "<br>",
-            "<button onclick='speakText(\"", gsub("\"", "&quot;", observed), "\")' style='margin-top: 10px; padding: 5px 10px; background-color: #ff6b6b; color: white; border: none; border-radius: 5px; cursor: pointer;'>🔊 Hear in Appalachian Accent</button>"
+            "<b>Observation:</b> ", observed
           )
         )
     }
