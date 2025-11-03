@@ -65,6 +65,13 @@ navbarPage(
              plotOutput("WordCloud", height = "auto"),
              
              hr(),
+             div(
+               style = "background-color: #2c3e50; padding: 20px; border-radius: 8px; margin-bottom: 20px;",
+               h3("What's in the Word Cloud?"),
+               tags$p("Each report made of a Bigfoot sighting had a section available to give an explanation of what the person saw."),
+               tags$p("This word cloud displays the most frequently used words in these descriptions."),
+               tags$p("Let's find out what all of these stories from first eye witnesses have in common...")
+             ),
              
              sidebarLayout(
                sidebarPanel(
@@ -80,7 +87,7 @@ navbarPage(
                ) 
              ), 
              
-           )#fluidPage
+           )#fluidPage for wordcloud
   ),#tabPanel for the word cloud
   
   tabPanel("Visualizations for Bigfoot Sightings",

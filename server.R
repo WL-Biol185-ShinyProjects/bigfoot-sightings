@@ -16,7 +16,7 @@ bigfoot_observations <- read_excel("bigfoot_observation.xlsx")
 function(input, output, session) {
   output$WordCloud <- renderPlot({
     
-    removed_words <- c("like", "the", "also", "didnt", "there", "got", "this", "just", "didnt")
+    removed_words <- c("like", "the", "also", "didnt", "there", "got", "this", "just", "didnt", "one")
     
     kept_words <- sapply( 1:nrow(bigfoot_data),
                           function(n) {
