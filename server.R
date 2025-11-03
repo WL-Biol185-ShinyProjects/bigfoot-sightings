@@ -46,7 +46,7 @@ function(input, output, session) {
       state_bar
     } else if(input$plotChoice == "Sightings by Temperature") {
       source("sightings-by-temp.R")
-      tempgrouped_bar
+      temp_high_bar
     }
   })
   output$info <- renderText({
