@@ -167,6 +167,72 @@ navbarPage(
     )
   )
            )#fluid page for heat map
-           )#tab panel for heat map
+           ),#tab panel for heat map
+  tabPanel("Moon Phase Tracker for BigFoot Sightings",
+           fluidPage(
+             tags$head(
+               tags$style(HTML("
+      body { background-color: #0a0e27; color: #ffffff; }
+      .well { background-color: #1e2742; border: none; }
+      h2, h3, h4 { color: #f9ca24; }
+      .info-box { 
+        background-color: #1e2742; 
+        padding: 15px; 
+        border-radius: 5px; 
+        margin: 10px 0;
+        border-left: 4px solid #f9ca24;
+      }
+    "))
+             ),
+             
+             titlePanel("Bigfoot Sightings by Moon Phase"),
+             
+             sidebarLayout(
+               sidebarPanel(
+                 h4("Animation Controls"),
+                 actionButton("animate", "Animate Through Phases", 
+                              icon = icon("play"),
+                              class = "btn-primary btn-lg",
+                              style = "width: 100%; margin-bottom: 10px;"),
+                 actionButton("stop", "Stop", 
+                              icon = icon("stop"),
+                              class = "btn-danger",
+                              style = "width: 100%; margin-bottom: 10px;"),
+                 sliderInput("phase_slider", "Select Moon Phase:", 
+                             min = 0, max = 1, value = 0, step = 0.01),
+                 sliderInput("speed", "Animation Speed:", 
+                             min = 1, max = 20, value = 10, step = 1),
+                 hr(),
+                 div(class = "info-box",
+                     h4("Current Phase:"),
+                     textOutput("phase_name")
+                 ),
+                 div(class = "info-box",
+                     h4("Sightings in Current Phase:"),
+                     textOutput("current_sightings")
+                 ),
+                 hr(),
+                 div(class = "info-box",
+                     h4("Most Sightings:"),
+                     textOutput("most_sightings_phase"),
+                     textOutput("most_sightings_count")
+                 ),
+                 div(class = "info-box",
+                     h4("Least Sightings:"),
+                     textOutput("least_sightings_phase"),
+                     textOutput("least_sightings_count")
+                 )
+               ),
+               
+               mainPanel(
+                 plotOutput("moon_plot", height = "500px"),
+                 hr(),
+                 h3("Bigfoot Sightings by Moon Phase"),
+                 plotOutput("phase_distribution", height = "300px")
+               )
+             )
+           )#fluidpgae for moonphase tracker
+    
+  )#tabPanel for moonphase tracker
   
 )#navbarPage

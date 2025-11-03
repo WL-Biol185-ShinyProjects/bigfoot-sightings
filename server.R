@@ -1,3 +1,5 @@
+source("moon_phase_generator.R")
+
 bigfoot_data <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv")
 
 library(wordcloud)
@@ -316,6 +318,147 @@ function(input, output, session) {
     # Add grid
     grid(col = "#333333", lty = 1)
   })
+  
+  
+  #MOON TRACKER STARTS HERE
+  
+  
+  
+  # Load bigfoot moon phase data
+  bigfoot_moon <- reactive({
+    df <- read.csv("filtered_data_date_moon_phase.csv")
+    df$date <- mdy(df$date)
+    df <- df %>% filter(!is.na(moon_phase))
+    return(df)
+  })
+  
+  # Bin sightings by phase
+  phase_bins <- reactive({
+    df <- bigfoot_moon()
+    
+    # Create phase bins (8 major phases)
+    df <- df %>%
+      mutate(
+        phase_bin = cut(moon_phase, 
+                        breaks = seq(0, 1, by = 0.125), 
+                        labels = c("New Moon", "Waxing Crescent", "First Quarter", 
+                                   "Waxing Gibbous", "Full Moon", "Waning Gibbous", 
+                                   "Last Quarter", "Waning Crescent"),
+                        include.lowest = TRUE)
+      ) %>%
+      group_by(phase_bin) %>%
+      summarise(count = n()) %>%
+      arrange(desc(count))
+    
+    return(df)
+  })
+  
+  # Get count for current phase
+  current_phase_count <- reactive({
+    phase <- input$phase_slider
+    df <- bigfoot_moon()
+    
+    # Find sightings within 0.0625 of current phase (1/16th of cycle)
+    nearby <- df %>%
+      filter(abs(moon_phase - phase) < 0.0625 | 
+               abs(moon_phase - phase) > 0.9375)
+    
+    return(nrow(nearby))
+  })
+  
+  # Reactive values for animation
+  animation_active <- reactiveVal(FALSE)
+  
+  # Start animation
+  observeEvent(input$animate, {
+    animation_active(TRUE)
+  })
+  
+  # Stop animation
+  observeEvent(input$stop, {
+    animation_active(FALSE)
+  })
+  
+  # Animation loop
+  observe({
+    invalidateLater(1000 / input$speed, session)
+    
+    if (animation_active()) {
+      new_phase <- input$phase_slider + 0.01
+      if (new_phase > 1) new_phase <- 0
+      updateSliderInput(session, "phase_slider", value = new_phase)
+    }
+  })
+  
+  # Render moon plot
+  output$moon_plot <- renderPlot({
+    create_moon_plot(input$phase_slider, current_phase_count())
+  }, bg = "#0a0e27")
+  
+  # Display phase name
+  output$phase_name <- renderText({
+    get_phase_name(input$phase_slider)
+  })
+  
+  # Display current sightings
+  output$current_sightings <- renderText({
+    paste(current_phase_count(), "sightings")
+  })
+  
+  # Display most sightings phase
+  output$most_sightings_phase <- renderText({
+    bins <- phase_bins()
+    as.character(bins$phase_bin[1])
+  })
+  
+  output$most_sightings_count <- renderText({
+    bins <- phase_bins()
+    paste(bins$count[1], "sightings")
+  })
+  
+  # Display least sightings phase
+  output$least_sightings_phase <- renderText({
+    bins <- phase_bins()
+    as.character(bins$phase_bin[nrow(bins)])
+  })
+  
+  output$least_sightings_count <- renderText({
+    bins <- phase_bins()
+    paste(bins$count[nrow(bins)], "sightings")
+  })
+  
+  # Phase distribution bar chart
+  output$phase_distribution <- renderPlot({
+    bins <- phase_bins()
+    
+    ggplot(bins, aes(x = reorder(phase_bin, -count), y = count, fill = phase_bin)) +
+      geom_bar(stat = "identity") +
+      scale_fill_manual(values = c(
+        "New Moon" = "#2c3e50",
+        "Waxing Crescent" = "#95a5a6",
+        "First Quarter" = "#bdc3c7",
+        "Waxing Gibbous" = "#ecf0f1",
+        "Full Moon" = "#f9ca24",
+        "Waning Gibbous" = "#ecf0f1",
+        "Last Quarter" = "#bdc3c7",
+        "Waning Crescent" = "#95a5a6"
+      )) +
+      labs(
+        title = "Bigfoot Sightings by Moon Phase",
+        x = "Moon Phase",
+        y = "Number of Sightings"
+      ) +
+      theme_minimal() +
+      theme(
+        plot.background = element_rect(fill = "#0a0e27", color = NA),
+        panel.background = element_rect(fill = "#1e2742", color = NA),
+        text = element_text(color = "#ffffff"),
+        axis.text = element_text(color = "#ffffff"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none",
+        panel.grid = element_line(color = "#2c3e50")
+      )
+  }, bg = "#0a0e27")
   
   
 }
