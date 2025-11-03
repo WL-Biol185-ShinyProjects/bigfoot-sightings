@@ -36,7 +36,7 @@ function(input, output, session) {
   
   
   
-  
+  # making the visualizations for sightings by season, state, and temperature and adding an interactive component
   output$selectedPlot <- renderPlot({
     if(input$plotChoice == "Sightings by Season") {
       source("Sightings-per-season-bar.R")
