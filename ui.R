@@ -1,4 +1,3 @@
-
 library(shiny)
 library(shinythemes)
 library(leaflet)
@@ -47,8 +46,7 @@ navbarPage(
       
       tags$img(id = "moving-image", 
                src = "new-bigfoot-image-removebg-preview.png",
-               width = "300px"),
-      
+               width = "300px")
       
       # website: https://pixabay.com/sound-effects/search/bigfoot/
       # https://en.wikipedia.org/wiki/Bigfoot
@@ -56,9 +54,9 @@ navbarPage(
     )
     
     
-  ), #tabPanel for the main page,
-  # Word cloud for the words most used in the bigfoot sighting reports 
+  ), #tabPanel for the main page
   
+  # Word cloud for the words most used in the bigfoot sighting reports 
   tabPanel("WordCloud", 
            fluidPage(
              h2("WordCloud of Words Used to Describe BigFoot Sightings"),
@@ -66,8 +64,7 @@ navbarPage(
              plotOutput("WordCloud", height = "auto"),
              
              hr(),
-<<<<<<< HEAD
-=======
+             
              div(
                style = "background-color: #2c3e50; padding: 20px; border-radius: 8px; margin-bottom: 20px;",
                h3("What's in the Word Cloud?"),
@@ -75,7 +72,6 @@ navbarPage(
                tags$p("This word cloud displays the most frequently used words in these descriptions."),
                tags$p("Let's find out what all of these stories from first eye witnesses have in common...")
              ),
->>>>>>> 67b73a3b460f0f9feeb3654b61eff7541e72a619
              
              sidebarLayout(
                sidebarPanel(
@@ -89,7 +85,7 @@ navbarPage(
                mainPanel(
                  plotOutput("wordcloud")
                ) 
-             ), 
+             )
              
            )#fluidPage for wordcloud
   ),#tabPanel for the word cloud
@@ -106,9 +102,9 @@ navbarPage(
            )#fluidpage for visualizations page
            
   ),#Tabpanel for visualizations page
+  
   tabPanel("Sightings and Weather",
            fluidPage(
-<<<<<<< HEAD
              tags$head(
                tags$style(HTML("
                body {
@@ -248,85 +244,8 @@ navbarPage(
                )
              )
            )
-  ),
-=======
-              sidebarLayout(
-    sidebarPanel(
-      width = 3,
-      
-      sliderInput("year_slider",
-                  "Select Year:",
-                  min = 1950,
-                  max = 2023,
-                  value = 1950,
-                  step = 1,
-                  animate = animationOptions(interval = 500, loop = TRUE),
-                  sep = ""),
-      
-      hr(),
-      
-      sliderInput("year_range",
-                  "Cumulative Year Range:",
-                  min = 1950,
-                  max = 2023,
-                  value = c(1950, 2023),
-                  step = 1,
-                  sep = ""),
-      
-      radioButtons("view_mode",
-                   "View Mode:",
-                   choices = c("Heat Map" = "heat",
-                               "Point Clusters" = "cluster",
-                               "Density Circles" = "circles"),
-                   selected = "heat"),
-      
-      conditionalPanel(
-        condition = "input.view_mode == 'heat'",
-        sliderInput("heatmap_radius",
-                    "Heat Map Radius:",
-                    min = 5,
-                    max = 50,
-                    value = 25,
-                    step = 5),
-        
-        sliderInput("heatmap_blur",
-                    "Heat Map Blur:",
-                    min = 5,
-                    max = 40,
-                    value = 15,
-                    step = 5)
-      ),
-      
-      conditionalPanel(
-        condition = "input.view_mode == 'circles'",
-        sliderInput("circle_size",
-                    "Circle Size:",
-                    min = 3,
-                    max = 15,
-                    value = 6,
-                    step = 1)
-      ),
-      
-      hr(),
-      
-      checkboxInput("show_state_boundaries", "Show State Boundaries", FALSE),
-      
-      hr(),
-      
-      textOutput("sighting_count"),
-      textOutput("year_info")
-    ),
-    
-    mainPanel(
-      width = 9,
-      leafletOutput("map", height = "600px"),
-      br(),
-      plotOutput("timeline_plot", height = "150px")
-    )
-  )
-           )#fluid page for heat map
-           ),#tab panel for heat map
->>>>>>> 67b73a3b460f0f9feeb3654b61eff7541e72a619
+  ),#tabPanel for Sightings and Weather
+  
   tabPanel("Moon Phase Tracker for Bigfoot Sightings",
            fluidPage(
              tags$head(
@@ -390,7 +309,7 @@ navbarPage(
                  plotOutput("phase_distribution", height = "300px")
                )
              )
-           )#fluidpgae for moonphase tracker
+           )#fluidPage for moonphase tracker
            
   )#tabPanel for moonphase tracker
   
