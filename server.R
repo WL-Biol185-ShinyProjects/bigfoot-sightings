@@ -1,5 +1,5 @@
 source("moon_phase_generator.R")
-
+#For web usage: By placing a link with the text "designed by {Author's Name} from Flaticon" in a visible spot, so the author's authorship is noticeable
 bigfoot_data <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv")
 
 library(wordcloud)
@@ -18,6 +18,14 @@ library(lubridate)
 library(maps)
 
 function(input, output, session) {
+  # Create custom Bigfoot icon
+  bigfoot_icon <- makeIcon(
+    iconUrl = "monkey.png",  # Example Bigfoot icon
+    iconWidth = 25, 
+    iconHeight = 25,
+    iconAnchorX = 12, 
+    iconAnchorY = 25
+  )
   
   # ============================================
   # WORD CLOUD
@@ -361,15 +369,11 @@ function(input, output, session) {
         mutate(marker_id = paste0("marker_", seq_len(n())))
       
       map <- map %>%
-        addCircleMarkers(
+        addMarkers(
           data = data_with_obs,
           lng = ~long,
           lat = ~lat,
-          radius = 5,
-          color = "#ff6b6b",
-          fillOpacity = 0.6,
-          stroke = TRUE,
-          weight = 1,
+          icon = bigfoot_icon,
           layerId = ~marker_id,
           clusterOptions = markerClusterOptions(
             showCoverageOnHover = FALSE,
@@ -389,17 +393,11 @@ function(input, output, session) {
         mutate(marker_id = paste0("marker_", seq_len(n())))
       
       map <- map %>%
-        addCircleMarkers(
+        addMarkers(
           data = data_with_obs,
           lng = ~long,
           lat = ~lat,
-          radius = input$circle_size,
-          color = "#ff6b6b",
-          fillColor = "#ff6b6b",
-          fillOpacity = 0.4,
-          stroke = TRUE,
-          weight = 1,
-          opacity = 0.8,
+          icon = bigfoot_icon,
           layerId = ~marker_id,
           popup = ~paste0(
             "<b>Date:</b> ", date_parsed, "<br>",
