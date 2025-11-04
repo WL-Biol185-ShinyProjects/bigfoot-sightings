@@ -20,7 +20,7 @@ high_temp_summary <- bigfoot_data %>%
   count(high_temp_bin)
 
 # create bar plot
-ggplot(high_temp_summary, aes(x = high_temp_bin, y = n))           +
+temp_high_bar <- ggplot(high_temp_summary, aes(x = high_temp_bin, y = n))           +
   
   geom_col(fill = "#0047AB", color = "black")                      +
   

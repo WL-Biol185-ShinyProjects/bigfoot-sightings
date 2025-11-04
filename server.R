@@ -24,7 +24,7 @@ function(input, output, session) {
   # ============================================
   output$WordCloud <- renderPlot({
     
-    removed_words <- c("like", "the", "also", "didnt", "there", "got", "this", "just", "didnt")
+    removed_words <- c("like", "the", "also", "didnt", "there", "got", "this", "just", "didnt", "one")
     
     kept_words <- sapply(1:nrow(bigfoot_data),
                          function(n) {
@@ -43,9 +43,14 @@ function(input, output, session) {
   }, height = 600, bg = "transparent")
   
   
+<<<<<<< HEAD
   # ============================================
   # VISUALIZATIONS (Season, State, Temperature)
   # ============================================
+=======
+  
+  # making the visualizations for sightings by season, state, and temperature and adding an interactive component
+>>>>>>> 67b73a3b460f0f9feeb3654b61eff7541e72a619
   output$selectedPlot <- renderPlot({
     if(input$plotChoice == "Sightings by Season") {
       source("Sightings-per-season-bar.R")
@@ -58,6 +63,24 @@ function(input, output, session) {
       temp_high_bar
     }
   })
+  output$info <- renderText({
+    print(input$plotChoice)
+    if (is.null(input$plot_click)) {
+      return("Click on a bar to see the number of observations")
+    }
+    if(input$plotChoice == "Sightings by Season") {
+      seasontable <- brushedPoints(bigfoot_season, input$plot_click)
+      paste(seasontable$n)
+    }
+    else if(input$plotChoice == "Sightings by State") {
+      statetable <- brushedPoints(number_sightings_per_state, input$plot_click)
+      paste(statetable$n)
+    }
+    else if(input$plotChoice == "Sightings by Temperature") {
+      temptable <- brushedPoints(temp_summary, input$plot_click)
+      paste(temptable$n)
+    }
+    })
   
   output$info <- renderText({
     print(input$plotChoice)
