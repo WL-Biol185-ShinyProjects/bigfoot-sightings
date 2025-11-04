@@ -1,3 +1,4 @@
+
 library(shiny)
 library(shinythemes)
 library(leaflet)
@@ -64,6 +65,8 @@ navbarPage(
              theme = shinytheme("darkly"),
              plotOutput("WordCloud", height = "auto"),
              
+             hr(),
+             
              sidebarLayout(
                sidebarPanel(
                  sliderInput("max_words",
@@ -86,89 +89,156 @@ navbarPage(
              h3("Multiple Visualizations of Bigfoot Sightings"), 
              selectInput("plotChoice" , "Choose a Plot:",
                          choices = c("Sightings by Season", "Sightings by State", "Sightings by Temperature")),
-             plotOutput("selectedPlot")
+             hr(),
+             h4("Click and drag on the top of any bar to see details"),
+             verbatimTextOutput("info"),
+             plotOutput("selectedPlot", brush = "plot_click")
            )#fluidpage for visualizations page
            
   ),#Tabpanel for visualizations page
-  tabPanel("Interactive HeatMap for Bigfoot Sightings",
+  tabPanel("Sightings and Weather",
            fluidPage(
-              sidebarLayout(
-    sidebarPanel(
-      width = 3,
-      
-      sliderInput("year_slider",
-                  "Select Year:",
-                  min = 1950,
-                  max = 2023,
-                  value = 1950,
-                  step = 1,
-                  animate = animationOptions(interval = 500, loop = TRUE),
-                  sep = ""),
-      
-      hr(),
-      
-      sliderInput("year_range",
-                  "Cumulative Year Range:",
-                  min = 1950,
-                  max = 2023,
-                  value = c(1950, 2023),
-                  step = 1,
-                  sep = ""),
-      
-      radioButtons("view_mode",
-                   "View Mode:",
-                   choices = c("Heat Map" = "heat",
-                               "Point Clusters" = "cluster",
-                               "Density Circles" = "circles"),
-                   selected = "heat"),
-      
-      conditionalPanel(
-        condition = "input.view_mode == 'heat'",
-        sliderInput("heatmap_radius",
-                    "Heat Map Radius:",
-                    min = 5,
-                    max = 50,
-                    value = 25,
-                    step = 5),
-        
-        sliderInput("heatmap_blur",
-                    "Heat Map Blur:",
-                    min = 5,
-                    max = 40,
-                    value = 15,
-                    step = 5)
-      ),
-      
-      conditionalPanel(
-        condition = "input.view_mode == 'circles'",
-        sliderInput("circle_size",
-                    "Circle Size:",
-                    min = 3,
-                    max = 15,
-                    value = 6,
-                    step = 1)
-      ),
-      
-      hr(),
-      
-      checkboxInput("show_state_boundaries", "Show State Boundaries", FALSE),
-      
-      hr(),
-      
-      textOutput("sighting_count"),
-      textOutput("year_info")
-    ),
-    
-    mainPanel(
-      width = 9,
-      leafletOutput("map", height = "600px"),
-      br(),
-      plotOutput("timeline_plot", height = "150px")
-    )
-  )
-           )#fluid page for heat map
-           ),#tab panel for heat map
-  tabPanel("Moon Phase Tracker for BigFoot Sightings",
+             tags$head(
+               tags$style(HTML("
+               body {
+                 background-color: #1a1a1a;
+                 color: white;
+               }
+               .box {
+                 background-color: #2c3e50;
+                 border: none;
+                 padding: 15px;
+                 border-radius: 5px;
+                 margin-bottom: 20px;
+               }
+               .leaflet-container {
+                 background-color: #1a1a1a;
+               }
+               .well {
+                 background-color: #1a1a1a;
+                 border: 1px solid #2c3e50;
+               }
+               h4 {
+                 font-weight: bold;
+                 color: white;
+               }
+               #sighting_count, #year_info {
+                 color: white;
+                 font-size: 14px;
+                 margin: 5px 0;
+               }
+             "))
+             ),
+             
+             titlePanel("Bigfoot Sightings & Weather Analysis"),
+             
+             sidebarLayout(
+               sidebarPanel(
+                 width = 3,
+                 
+                 # Bigfoot Sighting Controls
+                 h4("Bigfoot Sightings", style = "color: #ff6b6b;"),
+                 
+                 selectInput("view_mode", "Visualization Mode:",
+                             choices = c("Heatmap" = "heat",
+                                         "Clustered Markers" = "cluster", 
+                                         "Circle Markers" = "circles"),
+                             selected = "heat"),
+                 
+                 conditionalPanel(
+                   condition = "input.view_mode == 'heat'",
+                   sliderInput("heatmap_radius", "Heatmap Radius:",
+                               min = 5, max = 50, value = 25, step = 5),
+                   sliderInput("heatmap_blur", "Heatmap Blur:",
+                               min = 5, max = 50, value = 20, step = 5)
+                 ),
+                 
+                 conditionalPanel(
+                   condition = "input.view_mode == 'circles'",
+                   sliderInput("circle_size", "Circle Size:",
+                               min = 2, max = 15, value = 5, step = 1)
+                 ),
+                 
+                 sliderInput("year_slider", "Year (Cumulative):",
+                             min = 1900, max = 2024, value = 1900, 
+                             step = 1, sep = "",
+                             animate = animationOptions(interval = 300, loop = FALSE)),
+                 
+                 sliderInput("year_range", "Year Range Filter:",
+                             min = 1900, max = 2024, value = c(1900, 2024),
+                             step = 1, sep = ""),
+                 
+                 # Weather Data Controls
+                 h4("Weather Layers", style = "color: #4ecdc4; margin-top: 20px;"),
+                 
+                 checkboxGroupInput("weather_layers", "Show Weather Data:",
+                                    choices = c("High Temperature" = "temp_high",
+                                                "Low Temperature" = "temp_low",
+                                                "Precipitation" = "precip",
+                                                "Wind Direction" = "wind",
+                                                "Visibility" = "visibility"),
+                                    selected = NULL),
+                 
+                 conditionalPanel(
+                   condition = "input.weather_layers.includes('wind')",
+                   selectInput("state_filter", "Wind: Select States",
+                               choices = NULL,
+                               multiple = TRUE,
+                               selectize = TRUE)
+                 ),
+                 
+                 sliderInput("date_range", "Date Range for Weather:",
+                             min = as.Date("1900-01-01"),
+                             max = as.Date("2024-12-31"),
+                             value = c(as.Date("1900-01-01"), as.Date("2024-12-31")),
+                             timeFormat = "%Y-%m-%d"),
+                 
+                 # General Map Controls
+                 h4("Map Options", style = "margin-top: 20px;"),
+                 
+                 selectInput("map_state", "Zoom to State:",
+                             choices = "All States",
+                             selected = "All States"),
+                 
+                 checkboxInput("show_state_boundaries", "Show State Boundaries", 
+                               value = FALSE),
+                 
+                 hr(),
+                 
+                 # Statistics Display
+                 div(style = "padding: 15px; background-color: #2c3e50; border-radius: 5px;",
+                     textOutput("sighting_count"),
+                     textOutput("year_info")
+                 )
+               ),
+               
+               mainPanel(
+                 width = 9,
+                 
+                 div(class = "box",
+                     h4("Interactive Map"),
+                     leafletOutput("map", height = "600px")
+                 ),
+                 
+                 fluidRow(
+                   column(8,
+                          div(class = "box",
+                              h4("Sightings Timeline"),
+                              plotOutput("timeline_plot", height = "300px")
+                          )
+                   ),
+                   column(4,
+                          div(class = "box",
+                              h4("Legend"),
+                              htmlOutput("legend_info")
+                          )
+                   )
+                 )
+               )
+             )
+           )
+  ),
+  tabPanel("Moon Phase Tracker for Bigfoot Sightings",
            fluidPage(
              tags$head(
                tags$style(HTML("
@@ -232,7 +302,7 @@ navbarPage(
                )
              )
            )#fluidpgae for moonphase tracker
-    
+           
   )#tabPanel for moonphase tracker
   
 )#navbarPage
