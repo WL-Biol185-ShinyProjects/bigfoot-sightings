@@ -224,6 +224,20 @@ navbarPage(
                  
                  div(class = "box",
                      h4("Interactive Map"),
+                     
+                     # Add instructions here
+                     div(style = "padding: 10px; margin-bottom: 15px; background-color: #000000; border-radius: 5px;",
+                         tags$h4("How to Use This Map"),
+                         tags$p("The first dropdown that comes up is the heat map. This is demonstrating the sightings of Bigfoot across the United States using color gradients to show density; the more prevelent, the more red. 
+                                Next is the Clustered markers. this is demonstrating individual sightings grouped as circles with an exact number per cluster. 
+                                Last is circle markers, which show the exact points on the map where Bigfoot was sighted. If you click on a point, the observation pops up for you to read. 
+                                For the weather layers: If you click on high temperature, it is showing a a gradient of the high temperature (the darker the red the warmer) for that day of the sighting. Similarly, with low temperature the darker the blue the colder.
+                                Precipitation is showing what was occuring for that day for example: raining or snowing and how much.
+                                Wind direction is shown through the direction of the arrows that pop up. Please select a specific state to not overcrowd the map.
+                                Visibility is shown through the transparency or opaqueness of the circle. 
+                                If you click on any of the points when looking at weather, it will show the county and the respective weather information.")
+                     ),
+                     
                      leafletOutput("map", height = "600px")
                  ),
                  
@@ -261,13 +275,6 @@ navbarPage(
         border-left: 4px solid #f9ca24;
       }
     "))
-             ), hr(),
-             div(
-               style = "background-color: #2c3e50; padding: 20px; border-radius: 8px; margin-bottom: 20px;",
-               h3("The moon may move the tides, but does it move Bigfoot?"),
-               tags$p("This animation and graphs display our data of how many times Bigfoot was sighted during each moon phase"),
-               tags$p("We hope to discover how the moon might effect what people percoeve at night"),
-               tags$p("It may not be a coincidence that he is 'sighted' the most when the moon is darkest...")
              ),
              
              titlePanel("Bigfoot Sightings by Moon Phase"),
