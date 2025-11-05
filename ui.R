@@ -96,9 +96,9 @@ navbarPage(
              selectInput("plotChoice" , "Choose a Plot:",
                          choices = c("Sightings by Season", "Sightings by State", "Sightings by Temperature")),
              hr(),
-             h4("Click and drag on the top of any bar to see details"),
-             verbatimTextOutput("info"),
-             plotOutput("selectedPlot", brush = "plot_click")
+             h4("Click on top of any bar to see the number of sightings"),
+             fluidRow(plotOutput("selectedPlot", click = "plots_click")),
+             fluidRow(verbatimTextOutput("plots_text"))
            )#fluidpage for visualizations page
            
   ),#Tabpanel for visualizations page
@@ -228,6 +228,7 @@ navbarPage(
                      # Add instructions here
                      div(style = "padding: 10px; margin-bottom: 15px; background-color: #000000; border-radius: 5px;",
                          tags$h4("How to Use This Map"),
+<<<<<<< HEAD
                          tags$p("The first option in the dropdown that comes up is the heat map. This is demonstrating the sightings of Bigfoot across the United States using color gradients to show density; the more prevelent, the more red. 
                                 Next is the Clustered markers, which is demonstrating individual sightings grouped as circles with an exact number per cluster. 
                                 Last is circle markers, which show the exact points on the map where Bigfoot was sighted. If you click on a point, the observation pops up for you to read. 
@@ -236,6 +237,19 @@ navbarPage(
                                 Wind direction is shown through the direction of the arrows that pop up. Please select a specific state to not overcrowd the map.
                                 Visibility is shown through the transparency or opaqueness of the circle. 
                                 If you click on any of the points when looking at weather, it will show the county and the respective weather information.")
+=======
+                         tags$p("The first visualization option in the dropdown is a Heat Map. This demonstrates the Bigfoot sightings across the United States using color gradients to show density; the more sightings there are, the more red the map appears."), 
+                         tags$p("The second option in the dropdown is Clustered Markers. This demonstrates multiple sightings within the same general area grouped as circles with an exact number of sightings per circle."),
+                         tags$p("The third option in nthe dropdown is Circle Markers. This demonstrates the exact points on the map where a Bigfoot sighting is recorded. If you click on a point, the observation description pops up for you to read."), 
+                         tags$h4("Weather Layers description:"),
+                         tags$p("Clicking on High Temperature shows a gradient of the high temperature on the respective day of a sighting (the darker the red, the warmer).")                 ,
+                         tags$p("Clicking on Low Temperature shows a gradient of the low temperature on the respective day of a sighting (the darker the blue, the colder).")                  ,
+                         tags$p("Clicking on Precipitation shows the type of precipitative weather on the respective day of a sighting (for example: rain, snow, and the total amount).")      ,
+                         tags$p("Clicking on Wind Direction shows the direction the wind on the respective day of a sighting (shown by arrows).")                                              ,
+                         tags$p("Clicking on Visibility showns the visibility on the respective day of a sighting (shown by transparency of the circle; the more opaque, the less visible).")  ,
+                         tags$p("Please select a specific state for clearer visualization.")                                                                                                   ,
+                         tags$p("If you click on any of the points when looking at weather, the map will show the county and the respective weather information.")                             ,
+>>>>>>> 13b7d0be4bb306c63fcffed72af9fb9b27c5cf5b
                      ),
                      
                      leafletOutput("map", height = "600px")

@@ -58,6 +58,7 @@ function(input, output, session) {
 
   
   # making the visualizations for sightings by season, state, and temperature and adding an interactive component
+ 
   output$selectedPlot <- renderPlot({
     if(input$plotChoice == "Sightings by Season") {
       source("Sightings-per-season-bar.R")
@@ -70,41 +71,30 @@ function(input, output, session) {
       temp_high_bar
     }
   })
-  output$info <- renderText({
-    print(input$plotChoice)
-    if (is.null(input$plot_click)) {
-      return("Click on a bar to see the number of observations")
-    }
-    if(input$plotChoice == "Sightings by Season") {
-      seasontable <- brushedPoints(bigfoot_season, input$plot_click)
-      paste(seasontable$n)
-    }
-    else if(input$plotChoice == "Sightings by State") {
-      statetable <- brushedPoints(number_sightings_per_state, input$plot_click)
-      paste(statetable$n)
-    }
-    else if(input$plotChoice == "Sightings by Temperature") {
-      temptable <- brushedPoints(temp_summary, input$plot_click)
-      paste(temptable$n)
-    }
-    })
   
-  output$info <- renderText({
-    print(input$plotChoice)
-    if (is.null(input$plot_click)) {
-      return("Click on a bar to see the number of observations")
-    }
-    if(input$plotChoice == "Sightings by Season") {
-      seasontable <- brushedPoints(bigfoot_season, input$plot_click)
-      paste(seasontable$n)
-    }
-    else if(input$plotChoice == "Sightings by State") {
-      statetable <- brushedPoints(number_sightings_per_state, input$plot_click)
-      paste(statetable$n)
-    }
-    else if(input$plotChoice == "Sightings by Temperature") {
-      temptable <- brushedPoints(temp_summary, input$plot_click)
-      paste(temptable$n)
+  output$plots_text <- renderText({
+    if(!is.null(input$plots_click)) {
+      if(input$plotChoice == "Sightings by Season") {
+        source("Sightings-per-season-bar.R")
+        keepRows <- round(input$plots_click$x) == as.numeric(bigfoot_season$season)
+        rows <- bigfoot_season[keepRows,]
+        return(paste("Sightings:", rows$n))
+        
+      } else if(input$plotChoice == "Sightings by State") {
+        source("sightings-per-state.R")
+        keepRows <- round(input$plots_click$x) == as.numeric(number_sightings_per_state$state)
+        rows <- number_sightings_per_state[keepRows, ]
+        return(paste("Sightings:", rows$n))
+        
+      } else if(input$plotChoice == "Sightings by Temperature") {
+        source("sightings-by-temp.R")
+        keepRows <- round(input$plots_click$x) == as.numeric(high_temp_summary$high_temp_bin)
+        rows <- high_temp_summary[keepRows, ]
+        return(paste("Sightings:", rows$n))
+        
+      } else {
+        return("")
+      }
     }
   })
   
@@ -635,16 +625,22 @@ function(input, output, session) {
   phase_bins <- reactive({
     df <- bigfoot_moon()
     
-    # Create phase bins (8 major phases)
+    # Create phase bins (8 major phases) - each sighting in exactly one bin
     df <- df %>%
       mutate(
-        phase_bin = cut(moon_phase, 
-                        breaks = seq(0, 1, by = 0.125), 
-                        labels = c("New Moon", "Waxing Crescent", "First Quarter", 
-                                   "Waxing Gibbous", "Full Moon", "Waning Gibbous", 
-                                   "Last Quarter", "Waning Crescent"),
-                        include.lowest = TRUE)
+        phase_bin = case_when(
+          moon_phase >= 0 & moon_phase < 0.125 ~ "New Moon",
+          moon_phase >= 0.125 & moon_phase < 0.25 ~ "Waxing Crescent",
+          moon_phase >= 0.25 & moon_phase < 0.375 ~ "First Quarter",
+          moon_phase >= 0.375 & moon_phase < 0.5 ~ "Waxing Gibbous",
+          moon_phase >= 0.5 & moon_phase < 0.625 ~ "Full Moon",
+          moon_phase >= 0.625 & moon_phase < 0.75 ~ "Waning Gibbous",
+          moon_phase >= 0.75 & moon_phase < 0.875 ~ "Last Quarter",
+          moon_phase >= 0.875 & moon_phase <= 1 ~ "Waning Crescent",
+          TRUE ~ NA_character_
+        )
       ) %>%
+      filter(!is.na(phase_bin)) %>%
       group_by(phase_bin) %>%
       summarise(count = n()) %>%
       arrange(desc(count))
@@ -726,13 +722,42 @@ function(input, output, session) {
     paste(bins$count[nrow(bins)], "sightings")
   })
   
-  # Phase distribution bar chart
+  # Phase distribution correlation plot
   output$phase_distribution <- renderPlot({
     bins <- phase_bins()
     
-    ggplot(bins, aes(x = reorder(phase_bin, -count), y = count, fill = phase_bin)) +
-      geom_bar(stat = "identity") +
-      scale_fill_manual(values = c(
+    # Add moon brightness values (0 = New Moon/darkest, 1 = Full Moon/brightest)
+    bins <- bins %>%
+      mutate(
+        brightness = case_when(
+          phase_bin == "New Moon" ~ 0,
+          phase_bin == "Waxing Crescent" ~ 0.25,
+          phase_bin == "First Quarter" ~ 0.5,
+          phase_bin == "Waxing Gibbous" ~ 0.75,
+          phase_bin == "Full Moon" ~ 1,
+          phase_bin == "Waning Gibbous" ~ 0.75,
+          phase_bin == "Last Quarter" ~ 0.5,
+          phase_bin == "Waxing Crescent" ~ 0.25
+        )
+      )
+    
+    # Calculate linear regression model
+    model <- lm(count ~ brightness, data = bins)
+    r_squared <- summary(model)$r.squared
+    p_value <- summary(model)$coefficients[2, 4]  # p-value for brightness coefficient
+    slope <- coef(model)[2]
+    
+    # Create scatter plot with trend line
+    ggplot(bins, aes(x = brightness, y = count)) +
+      geom_point(aes(color = phase_bin), size = 5, alpha = 0.8) +
+      geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
+      # Add text labels showing count for each point
+      geom_text(aes(label = count), 
+                vjust = -1.2, 
+                color = "#ffffff", 
+                size = 4, 
+                fontface = "bold") +
+      scale_color_manual(values = c(
         "New Moon" = "#2c3e50",
         "Waxing Crescent" = "#95a5a6",
         "First Quarter" = "#bdc3c7",
@@ -742,21 +767,79 @@ function(input, output, session) {
         "Last Quarter" = "#bdc3c7",
         "Waning Crescent" = "#95a5a6"
       )) +
+      scale_x_continuous(
+        breaks = c(0, 0.25, 0.5, 0.75, 1),
+        labels = c("New\nMoon\n(Darkest)", "Crescent", "Quarter", "Gibbous", "Full\nMoon\n(Brightest)")
+      ) +
+      scale_y_continuous(expand = expansion(mult = c(0.05, 0.15))) +  # Add space at top for labels
       labs(
-        title = "Bigfoot Sightings by Moon Phase",
-        x = "Moon Phase",
-        y = "Number of Sightings"
+        title = paste0("Bigfoot Sightings vs Moon Brightness"),
+        subtitle = paste0(
+          "R² = ", round(r_squared, 3), 
+          " | Slope = ", round(slope, 2),
+          " | p-value = ", format.pval(p_value, digits = 3),
+          "\n",
+          if(p_value < 0.05 & slope < 0) {
+            "Significant negative relationship: MORE sightings during darker moon phases"
+          } else if(p_value < 0.05 & slope > 0) {
+            "Significant positive relationship: MORE sightings during brighter moon phases"
+          } else {
+            "No significant relationship between moon phase and sightings"
+          }
+        ),
+        x = "Moon Brightness",
+        y = "Number of Sightings",
+        color = "Moon Phase"
       ) +
       theme_minimal() +
       theme(
         plot.background = element_rect(fill = "#0a0e27", color = NA),
         panel.background = element_rect(fill = "#1e2742", color = NA),
-        text = element_text(color = "#ffffff"),
+        text = element_text(color = "#ffffff", size = 12),
+        plot.title = element_text(size = 16, face = "bold"),
+        plot.subtitle = element_text(size = 12, color = "#f9ca24"),
         axis.text = element_text(color = "#ffffff"),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "none",
-        panel.grid = element_line(color = "#2c3e50")
+        axis.title = element_text(size = 13, face = "bold"),
+        legend.background = element_rect(fill = "#1e2742", color = NA),
+        legend.key = element_rect(fill = "#1e2742"),
+        legend.text = element_text(color = "#ffffff"),
+        legend.title = element_text(color = "#ffffff", face = "bold"),
+        panel.grid.major = element_line(color = "#2c3e50", linewidth = 0.5),
+        panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
       )
   }, bg = "#0a0e27")
+  
+  # Add a summary table output
+  output$phase_summary_table <- renderTable({
+    bins <- phase_bins()
+    
+    # Add moon brightness values
+    bins <- bins %>%
+      mutate(
+        brightness = case_when(
+          phase_bin == "New Moon" ~ 0,
+          phase_bin == "Waxing Crescent" ~ 0.25,
+          phase_bin == "First Quarter" ~ 0.5,
+          phase_bin == "Waxing Gibbous" ~ 0.75,
+          phase_bin == "Full Moon" ~ 1,
+          phase_bin == "Waning Gibbous" ~ 0.75,
+          phase_bin == "Last Quarter" ~ 0.5,
+          phase_bin == "Waning Crescent" ~ 0.25
+        )
+      ) %>%
+      arrange(brightness) %>%
+      select(`Moon Phase` = phase_bin, 
+             `Brightness` = brightness, 
+             `Sightings` = count)
+    
+    return(bins)
+  }, 
+  striped = TRUE,
+  hover = TRUE,
+  bordered = TRUE,
+  width = "100%",
+  align = 'c',
+  bg = "#1e2742",
+  color = "#ffffff")
   
 }

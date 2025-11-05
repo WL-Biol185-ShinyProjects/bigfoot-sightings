@@ -19,6 +19,9 @@ high_temp_summary <- bigfoot_data %>%
   
   count(high_temp_bin)
 
+# create factor for interaction
+high_temp_summary$high_temp_bin <- factor(high_temp_summary$high_temp_bin)
+
 # create bar plot
 temp_high_bar <- ggplot(high_temp_summary, aes(x = high_temp_bin, y = n))           +
   
