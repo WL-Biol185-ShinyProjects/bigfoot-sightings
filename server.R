@@ -369,12 +369,17 @@ function(input, output, session) {
         mutate(marker_id = paste0("marker_", seq_len(n())))
       
       map <- map %>%
-        addMarkers(
+        addCircleMarkers(
           data = data_with_obs,
           lng = ~long,
           lat = ~lat,
-          icon = bigfoot_icon,
+          radius=4,
+          color = "#ff6b6b",
+          fillOpacity = 0.6,
+          stroke = TRUE,
+          weight = 1,
           layerId = ~marker_id,
+        
           clusterOptions = markerClusterOptions(
             showCoverageOnHover = FALSE,
             zoomToBoundsOnClick = TRUE
@@ -393,11 +398,16 @@ function(input, output, session) {
         mutate(marker_id = paste0("marker_", seq_len(n())))
       
       map <- map %>%
-        addMarkers(
+        addCircleMarkers(
           data = data_with_obs,
           lng = ~long,
           lat = ~lat,
-          icon = bigfoot_icon,
+          radius = input$circle_size,
+          color = "#ff6b6b",
+          fillOpacity = 0.4,
+          stroke = TRUE,
+          weight = 1,
+          opacity = 0.7,
           layerId = ~marker_id,
           popup = ~paste0(
             "<b>Date:</b> ", date_parsed, "<br>",
