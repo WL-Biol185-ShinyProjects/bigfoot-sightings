@@ -1,6 +1,8 @@
 number_sightings_per_state <- bigfoot_data %>%
   count(state)
 
+number_sightings_per_state$state <- factor(number_sightings_per_state$state)
+
 state_bar <- ggplot(number_sightings_per_state,
                     aes(state, n)) +
   geom_col(fill = "#0047AB") + 

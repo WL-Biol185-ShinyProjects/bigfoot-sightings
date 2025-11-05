@@ -58,6 +58,7 @@ function(input, output, session) {
 
   
   # making the visualizations for sightings by season, state, and temperature and adding an interactive component
+ 
   output$selectedPlot <- renderPlot({
     if(input$plotChoice == "Sightings by Season") {
       source("Sightings-per-season-bar.R")
@@ -70,41 +71,30 @@ function(input, output, session) {
       temp_high_bar
     }
   })
-  output$info <- renderText({
-    print(input$plotChoice)
-    if (is.null(input$plot_click)) {
-      return("Click on a bar to see the number of observations")
-    }
-    if(input$plotChoice == "Sightings by Season") {
-      seasontable <- brushedPoints(bigfoot_season, input$plot_click)
-      paste(seasontable$n)
-    }
-    else if(input$plotChoice == "Sightings by State") {
-      statetable <- brushedPoints(number_sightings_per_state, input$plot_click)
-      paste(statetable$n)
-    }
-    else if(input$plotChoice == "Sightings by Temperature") {
-      temptable <- brushedPoints(temp_summary, input$plot_click)
-      paste(temptable$n)
-    }
-    })
   
-  output$info <- renderText({
-    print(input$plotChoice)
-    if (is.null(input$plot_click)) {
-      return("Click on a bar to see the number of observations")
-    }
-    if(input$plotChoice == "Sightings by Season") {
-      seasontable <- brushedPoints(bigfoot_season, input$plot_click)
-      paste(seasontable$n)
-    }
-    else if(input$plotChoice == "Sightings by State") {
-      statetable <- brushedPoints(number_sightings_per_state, input$plot_click)
-      paste(statetable$n)
-    }
-    else if(input$plotChoice == "Sightings by Temperature") {
-      temptable <- brushedPoints(temp_summary, input$plot_click)
-      paste(temptable$n)
+  output$plots_text <- renderText({
+    if(!is.null(input$plots_click)) {
+      if(input$plotChoice == "Sightings by Season") {
+        source("Sightings-per-season-bar.R")
+        keepRows <- round(input$plots_click$x) == as.numeric(bigfoot_season$season)
+        rows <- bigfoot_season[keepRows,]
+        return(paste("Sightings:", rows$n))
+        
+      } else if(input$plotChoice == "Sightings by State") {
+        source("sightings-per-state.R")
+        keepRows <- round(input$plots_click$x) == as.numeric(number_sightings_per_state$state)
+        rows <- number_sightings_per_state[keepRows, ]
+        return(paste("Sightings:", rows$n))
+        
+      } else if(input$plotChoice == "Sightings by Temperature") {
+        source("sightings-by-temp.R")
+        keepRows <- round(input$plots_click$x) == as.numeric(high_temp_summary$high_temp_bin)
+        rows <- high_temp_summary[keepRows, ]
+        return(paste("Sightings:", rows$n))
+        
+      } else {
+        return("")
+      }
     }
   })
   
