@@ -747,17 +747,26 @@ function(input, output, session) {
           phase_bin == "Full Moon" ~ 1,
           phase_bin == "Waning Gibbous" ~ 0.75,
           phase_bin == "Last Quarter" ~ 0.5,
-          phase_bin == "Waning Crescent" ~ 0.25
+          phase_bin == "Waxing Crescent" ~ 0.25
         )
       )
     
-    # Calculate correlation
-    correlation <- cor(bins$brightness, bins$count)
+    # Calculate linear regression model
+    model <- lm(count ~ brightness, data = bins)
+    r_squared <- summary(model)$r.squared
+    p_value <- summary(model)$coefficients[2, 4]  # p-value for brightness coefficient
+    slope <- coef(model)[2]
     
     # Create scatter plot with trend line
     ggplot(bins, aes(x = brightness, y = count)) +
       geom_point(aes(color = phase_bin), size = 5, alpha = 0.8) +
       geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
+      # Add text labels showing count for each point
+      geom_text(aes(label = count), 
+                vjust = -1.2, 
+                color = "#ffffff", 
+                size = 4, 
+                fontface = "bold") +
       scale_color_manual(values = c(
         "New Moon" = "#2c3e50",
         "Waxing Crescent" = "#95a5a6",
@@ -772,16 +781,22 @@ function(input, output, session) {
         breaks = c(0, 0.25, 0.5, 0.75, 1),
         labels = c("New\nMoon\n(Darkest)", "Crescent", "Quarter", "Gibbous", "Full\nMoon\n(Brightest)")
       ) +
+      scale_y_continuous(expand = expansion(mult = c(0.05, 0.15))) +  # Add space at top for labels
       labs(
-        title = paste0("Bigfoot Sightings vs Moon Brightness (Correlation: ", 
-                       round(correlation, 3), ")"),
-        subtitle = if(correlation < -0.3) {
-          "Negative correlation suggests MORE sightings during darker moon phases"
-        } else if(correlation > 0.3) {
-          "Positive correlation suggests MORE sightings during brighter moon phases"
-        } else {
-          "Weak correlation suggests moon phase has little effect on sightings"
-        },
+        title = paste0("Bigfoot Sightings vs Moon Brightness"),
+        subtitle = paste0(
+          "R² = ", round(r_squared, 3), 
+          " | Slope = ", round(slope, 2),
+          " | p-value = ", format.pval(p_value, digits = 3),
+          "\n",
+          if(p_value < 0.05 & slope < 0) {
+            "Significant negative relationship: MORE sightings during darker moon phases"
+          } else if(p_value < 0.05 & slope > 0) {
+            "Significant positive relationship: MORE sightings during brighter moon phases"
+          } else {
+            "No significant relationship between moon phase and sightings"
+          }
+        ),
         x = "Moon Brightness",
         y = "Number of Sightings",
         color = "Moon Phase"
@@ -803,5 +818,38 @@ function(input, output, session) {
         panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
       )
   }, bg = "#0a0e27")
+  
+  # Add a summary table output
+  output$phase_summary_table <- renderTable({
+    bins <- phase_bins()
+    
+    # Add moon brightness values
+    bins <- bins %>%
+      mutate(
+        brightness = case_when(
+          phase_bin == "New Moon" ~ 0,
+          phase_bin == "Waxing Crescent" ~ 0.25,
+          phase_bin == "First Quarter" ~ 0.5,
+          phase_bin == "Waxing Gibbous" ~ 0.75,
+          phase_bin == "Full Moon" ~ 1,
+          phase_bin == "Waning Gibbous" ~ 0.75,
+          phase_bin == "Last Quarter" ~ 0.5,
+          phase_bin == "Waning Crescent" ~ 0.25
+        )
+      ) %>%
+      arrange(brightness) %>%
+      select(`Moon Phase` = phase_bin, 
+             `Brightness` = brightness, 
+             `Sightings` = count)
+    
+    return(bins)
+  }, 
+  striped = TRUE,
+  hover = TRUE,
+  bordered = TRUE,
+  width = "100%",
+  align = 'c',
+  bg = "#1e2742",
+  color = "#ffffff")
   
 }
