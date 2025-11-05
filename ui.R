@@ -96,9 +96,9 @@ navbarPage(
              selectInput("plotChoice" , "Choose a Plot:",
                          choices = c("Sightings by Season", "Sightings by State", "Sightings by Temperature")),
              hr(),
-             h4("Click and drag on the top of any bar to see details"),
-             verbatimTextOutput("info"),
-             plotOutput("selectedPlot", brush = "plot_click")
+             h4("Click on top of any bar to see the number of sightings"),
+             fluidRow(plotOutput("selectedPlot", click = "plots_click")),
+             fluidRow(verbatimTextOutput("plots_text"))
            )#fluidpage for visualizations page
            
   ),#Tabpanel for visualizations page
