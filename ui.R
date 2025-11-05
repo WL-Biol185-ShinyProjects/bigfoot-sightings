@@ -228,8 +228,8 @@ navbarPage(
                      # Add instructions here
                      div(style = "padding: 10px; margin-bottom: 15px; background-color: #000000; border-radius: 5px;",
                          tags$h4("How to Use This Map"),
-                         tags$p("The first dropdown that comes up is the heat map. This is demonstrating the sightings of Bigfoot across the United States using color gradients to show density; the more prevelent, the more red. 
-                                Next is the Clustered markers. this is demonstrating individual sightings grouped as circles with an exact number per cluster. 
+                         tags$p("The first option in the dropdown that comes up is the heat map. This is demonstrating the sightings of Bigfoot across the United States using color gradients to show density; the more prevelent, the more red. 
+                                Next is the Clustered markers, which is demonstrating individual sightings grouped as circles with an exact number per cluster. 
                                 Last is circle markers, which show the exact points on the map where Bigfoot was sighted. If you click on a point, the observation pops up for you to read. 
                                 For the weather layers: If you click on high temperature, it is showing a a gradient of the high temperature (the darker the red the warmer) for that day of the sighting. Similarly, with low temperature the darker the blue the colder.
                                 Precipitation is showing what was occuring for that day for example: raining or snowing and how much.
@@ -325,6 +325,66 @@ navbarPage(
              )
            )#fluidPage for moonphase tracker
            
-  )#tabPanel for moonphase tracker
+  ),#tabPanel for moonphase tracker, 
+  #about us page,
+  tabPanel("About Us",
+           fluidPage(
+             div(style = "max-width: 900px; margin: 0 auto; padding: 40px 20px;",
+                 
+                 # Header
+                 div(style = "text-align: center; margin-bottom: 40px;",
+                     tags$h1("About Us"),
+                    
+                 ),
+                 
+                 # Project Description
+                 div(style = "margin-bottom: 30px;",
+                     tags$h3("About the Creators"),
+                     tags$p("As science majors, our group wanted to branch out of our typical realm and branch into something more mythical, Bigfoot. Or actually.... maybe more realistic?
+                             Being able to research without havnig to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
+                              div(style = "text-align: center;",
+                                  tags$img(src = "Bigfoot_group.png", width = "600px")
+                              )
+                     ),
+                     tags$p("Sophia Taylor (far left) is a Neuroscience and Spanish double major on the pre-med track. On campus she is a Community Assistant for Residence Life, Vice President of Recruitment for Panhellenic Council, President of the LEAD program, President of the Pre-Health club, member of the Leadership Excellence Awards Committee, member of Alpha Delta Pi, Traveller and University store employee, and does research in the Neuroscience Department at W&L. "),
+                     tags$p("Jake Walters (second from left)"),
+                     tags$p("Ella Moser (Second from right)"),
+                     tags$p("Sarfah Stockton (far right)")
+                 ),
+                 
+                 # What We Offer
+                 div(style = "margin-bottom: 30px;",
+                     tags$h3("What We Offer"),
+                     tags$ul(
+                       tags$li("Interactive maps showing sighting locations"),
+                       tags$li("Weather data analysis for reported encounters"),
+                       tags$li("Filtering tools to explore patterns and trends"),
+                       tags$li("Detailed information about each sighting report")
+                     )
+                 ),
+                 
+                 # Data Sources
+                 div(style = "margin-bottom: 30px;",
+                     tags$h3("Data Sources"),
+                     tags$p("Our data comes from the Bigfoot Field Researchers Organization (BFRO) 
+               database, which contains thousands of reported sightings dating back 
+               several decades. Weather data is sourced from historical meteorological 
+               records.")
+                 ),
+                 
+                 # Contact/Creator Info
+                 div(style = "margin-bottom: 30px;",
+                     tags$h3("About the Creator"),
+                     tags$p("This application was developed as part of a data visualization project. 
+               For questions or feedback, please contact [Gregg Whitworth/gwhitworth@wlu.edu].")
+                 ),
+                 
+                 # Footer
+                 div(style = "text-align: center; margin-top: 50px; color: #666;",
+                     tags$p(tags$em("Last updated: November 2025"))
+                 )
+             )
+           )#fluid page for about us
+  )#tabpanel for about us
   
-)#navbarPage
+#navbarPage
