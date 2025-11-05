@@ -354,15 +354,15 @@ navbarPage(
                  div(style = "margin-bottom: 30px;",
                      tags$h3("About the Creators"),
                      tags$p("As science majors, our group wanted to branch out of our typical realm and branch into something more mythical, Bigfoot. Or actually.... maybe more realistic?
-                             Being able to research without havnig to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
+                             Being able to research without having to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
                               div(style = "text-align: center;",
                                   tags$img(src = "Bigfoot_group.png", width = "600px")
                               )
                      ),
                      tags$p("Sophia Taylor (far left) is a Neuroscience and Spanish double major on the pre-med track. On campus she is a Community Assistant for Residence Life, Vice President of Recruitment for Panhellenic Council, President of the LEAD program, President of the Pre-Health club, member of the Leadership Excellence Awards Committee, member of Alpha Delta Pi, Traveller and University store employee, and does research in the Neuroscience Department at W&L. "),
-                     tags$p("Jake Walters (second from left)"),
+                     tags$p("Jake Walters (second from left) is a Neuroscience major on the pre-med track. On campus Jake is collecting all the frat infinity stones: Phi delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, and is a Sustainability intern."),
                      tags$p("Ella Moser (Second from right)"),
-                     tags$p("Sarfah Stockton (far right)")
+                     tags$p("Sarah Stockton (far right)")
                  ),
                  
                  # What We Offer
