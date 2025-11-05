@@ -261,6 +261,13 @@ navbarPage(
         border-left: 4px solid #f9ca24;
       }
     "))
+             ), hr(),
+             div(
+               style = "background-color: #2c3e50; padding: 20px; border-radius: 8px; margin-bottom: 20px;",
+               h3("The moon may move the tides, but does it move Bigfoot?"),
+               tags$p("This animation and graphs display our data of how many times Bigfoot was sighted during each moon phase"),
+               tags$p("We hope to discover how the moon might effect what people percoeve at night"),
+               tags$p("It may not be a coincidence that he is 'sighted' the most when the moon is darkest...")
              ),
              
              titlePanel("Bigfoot Sightings by Moon Phase"),
