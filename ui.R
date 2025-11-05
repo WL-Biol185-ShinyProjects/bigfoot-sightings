@@ -228,7 +228,7 @@ navbarPage(
                      # Add instructions here
                      div(style = "padding: 10px; margin-bottom: 15px; background-color: #000000; border-radius: 5px;",
                          tags$h4("How to Use This Map"),
-<<<<<<< HEAD
+
                          tags$p("The first option in the dropdown that comes up is the heat map. This is demonstrating the sightings of Bigfoot across the United States using color gradients to show density; the more prevelent, the more red. 
                                 Next is the Clustered markers, which is demonstrating individual sightings grouped as circles with an exact number per cluster. 
                                 Last is circle markers, which show the exact points on the map where Bigfoot was sighted. If you click on a point, the observation pops up for you to read. 
@@ -236,8 +236,7 @@ navbarPage(
                                 Precipitation is showing what was occuring for that day for example: raining or snowing and how much.
                                 Wind direction is shown through the direction of the arrows that pop up. Please select a specific state to not overcrowd the map.
                                 Visibility is shown through the transparency or opaqueness of the circle. 
-                                If you click on any of the points when looking at weather, it will show the county and the respective weather information.")
-=======
+                                If you click on any of the points when looking at weather, it will show the county and the respective weather information."),
                          tags$p("The first visualization option in the dropdown is a Heat Map. This demonstrates the Bigfoot sightings across the United States using color gradients to show density; the more sightings there are, the more red the map appears."), 
                          tags$p("The second option in the dropdown is Clustered Markers. This demonstrates multiple sightings within the same general area grouped as circles with an exact number of sightings per circle."),
                          tags$p("The third option in nthe dropdown is Circle Markers. This demonstrates the exact points on the map where a Bigfoot sighting is recorded. If you click on a point, the observation description pops up for you to read."), 
@@ -249,7 +248,7 @@ navbarPage(
                          tags$p("Clicking on Visibility showns the visibility on the respective day of a sighting (shown by transparency of the circle; the more opaque, the less visible).")  ,
                          tags$p("Please select a specific state for clearer visualization.")                                                                                                   ,
                          tags$p("If you click on any of the points when looking at weather, the map will show the county and the respective weather information.")                             ,
->>>>>>> 13b7d0be4bb306c63fcffed72af9fb9b27c5cf5b
+
                      ),
                      
                      leafletOutput("map", height = "600px")
