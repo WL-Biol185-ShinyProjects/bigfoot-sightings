@@ -14,8 +14,9 @@ navbarPage(
       div(style = "text-align: center;",
           tags$img(src = "bigfoot-landing-page.jpg", width = "900px"),
           tags$h1("Welcome to Bigfoot Sightings"),
-          tags$h2("Have you ever wondered where Bigfoot has been found? 
-        Want to know where to look next? Well, you've come to the right place!")), 
+          tags$h2("Bigfoot...Fact or Fiction?"),
+          tags$h3("Have you ever wondered where Bigfoot has been found? 
+                    Want to know where to look next? Well, you've come to the right place!")), 
       
       tags$head(
         tags$style(HTML("
@@ -353,8 +354,13 @@ navbarPage(
                      ),
                      tags$p("Sophia Taylor (far left) is a Neuroscience and Spanish double major on the pre-med track. On campus she is a Community Assistant for Residence Life, Vice President of Recruitment for Panhellenic Council, President of the LEAD program, President of the Pre-Health club, member of the Leadership Excellence Awards Committee, member of Alpha Delta Pi, Traveller and University store employee, and does research in the Neuroscience Department at W&L. "),
                      tags$p("Jake Walters (second from left) is a Neuroscience major on the pre-med track. On campus he is collecting all the frat infinity stones: Phi delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, logistics chair of Remote Area Medical, and is a Sustainability intern."),
+<<<<<<< HEAD
                      tags$p("Ella Moser (second from right) is a Biology major and art history minor on the pre-med track. On campus she is the president of Washington and Lee Brain Exercise Initiative, a member of the Generals Activity board, and a member of Remote Area Medical. "),
                      tags$p("Sarah Stockton (far right) is a Neuroscience and Politics double major on the pre-med track. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Affice and a member of Pi Beta Phi. ")
+=======
+                     tags$p("Ella Moser (Second from right) is a Biology major and art history minor on the pre-med track. On campus she is the president of Washington and Lee Brain Exercise Initiative, a member of the Generals Activity board, and a member of Remote Area Medical. "),
+                     tags$p("Sarah Stockton (far right) is a Neuroscience and Politics double major on the pre-med track. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Office and a member of Pi Beta Phi. ")
+>>>>>>> a66e6016e81f78fba8d014fd5a24dd63a3654597
                  ),
                  
                  # What We Offer
