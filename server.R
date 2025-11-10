@@ -196,20 +196,6 @@ function(input, output, session) {
                         min = min_year,
                         max = max_year,
                         value = min_year)
-      
-      updateSliderInput(session, "year_range",
-                        min = min_year,
-                        max = max_year,
-                        value = c(min_year, max_year))
-      
-      # Update date range slider
-      dates_available <- data$date_parsed[!is.na(data$date_parsed)]
-      if(length(dates_available) > 0) {
-        updateSliderInput(session, "date_range",
-                          min = min(dates_available, na.rm = TRUE),
-                          max = max(dates_available, na.rm = TRUE),
-                          value = c(min(dates_available, na.rm = TRUE), 
-                                    max(dates_available, na.rm = TRUE)))
       }
       
       # Update state filter choices
@@ -222,16 +208,16 @@ function(input, output, session) {
       updateSelectInput(session, "state_filter",
                         choices = states,
                         selected = NULL)
-    }
+  
   })
   
   # Filter Bigfoot data based on inputs
   filtered_sf <- reactive({
     data <- bigfoot_sf()
     
-    # Filter by year range (cumulative up to selected year)
+    # Filter by year (cumulative up to selected year)
     data <- data %>%
-      filter(year >= input$year_range[1] & year <= input$year_slider)
+      filter(year <= input$year_slider)
     
     # Filter by selected state if not "All States"
     if(!is.null(input$map_state) && input$map_state != "All States") {
@@ -242,12 +228,14 @@ function(input, output, session) {
   })
   
   # Filter weather data based on date range and selected state
+  # Filter weather data based on year filters and selected state
+  # Filter weather data based on year filters and selected state
   filtered_weather <- reactive({
     df <- weather_data()
     
-    # Filter by date range
+    # Filter by year range (cumulative up to selected year) - matching the bigfoot data filter
     df <- df %>%
-      filter(!is.na(date_parsed) & date_parsed >= input$date_range[1] & date_parsed <= input$date_range[2])
+      filter(!is.na(year) & year <= input$year_slider)
     
     # Filter by selected state if not "All States"
     if(!is.null(input$map_state) && input$map_state != "All States") {
@@ -269,7 +257,7 @@ function(input, output, session) {
       ) %>%
       filter(!is.na(lat) & !is.na(long))
   })
-  
+ 
   # Load state boundaries
   state_boundaries <- reactive({
     if(input$show_state_boundaries) {
@@ -533,14 +521,14 @@ function(input, output, session) {
   })
   
   output$year_info <- renderText({
-    paste("Showing:", input$year_range[1], "to", input$year_slider)
+    paste("Showing: 1900 to", input$year_slider)
   })
   
   # Timeline plot showing all data
   output$timeline_plot <- renderPlot({
     data <- bigfoot_sf() %>%
       st_drop_geometry() %>%
-      filter(year >= input$year_range[1] & year <= input$year_range[2])
+      filter(year <= input$year_slider)
     
     if(nrow(data) == 0) {
       plot.new()

@@ -170,35 +170,27 @@ navbarPage(
                              min = 1900, max = 2024, value = 1900, 
                              step = 1, sep = "",
                              animate = animationOptions(interval = 300, loop = FALSE)),
-                 
-                 sliderInput("year_range", "Year Range Filter:",
-                             min = 1900, max = 2024, value = c(1900, 2024),
-                             step = 1, sep = ""),
+             
                  
                  # Weather Data Controls
                  h4("Weather Layers", style = "color: #4ecdc4; margin-top: 20px;"),
                  
-                 checkboxGroupInput("weather_layers", "Show Weather Data:",
-                                    choices = c("High Temperature" = "temp_high",
-                                                "Low Temperature" = "temp_low",
-                                                "Precipitation" = "precip",
-                                                "Wind Direction" = "wind",
-                                                "Visibility" = "visibility"),
-                                    selected = NULL),
+                 selectInput("weather_layers", "Show Weather Data:",
+                             choices = c("None" = "none",
+                                         "High Temperature" = "temp_high",
+                                         "Low Temperature" = "temp_low",
+                                         "Precipitation" = "precip",
+                                         "Wind Direction" = "wind",
+                                         "Visibility" = "visibility"),
+                             selected = "none"),
                  
                  conditionalPanel(
-                   condition = "input.weather_layers.includes('wind')",
+                   condition = "input.weather_layers == 'wind'",
                    selectInput("state_filter", "Wind: Select States",
                                choices = NULL,
                                multiple = TRUE,
                                selectize = TRUE)
                  ),
-                 
-                 sliderInput("date_range", "Date Range for Weather:",
-                             min = as.Date("1900-01-01"),
-                             max = as.Date("2024-12-31"),
-                             value = c(as.Date("1900-01-01"), as.Date("2024-12-31")),
-                             timeFormat = "%Y-%m-%d"),
                  
                  # General Map Controls
                  h4("Map Options", style = "margin-top: 20px;"),
@@ -361,7 +353,7 @@ navbarPage(
                      ),
                      tags$p("Sophia Taylor (far left) is a Neuroscience and Spanish double major on the pre-med track. On campus she is a Community Assistant for Residence Life, Vice President of Recruitment for Panhellenic Council, President of the LEAD program, President of the Pre-Health club, member of the Leadership Excellence Awards Committee, member of Alpha Delta Pi, Traveller and University store employee, and does research in the Neuroscience Department at W&L. "),
                      tags$p("Jake Walters (second from left) is a Neuroscience major on the pre-med track. On campus he is collecting all the frat infinity stones: Phi delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, logistics chair of Remote Area Medical, and is a Sustainability intern."),
-                     tags$p("Ella Moser (Second from right) is a Biology major and art history minor on the pre-med track. On campus she is the president of Washington and Lee Brain Exercise Initiative, a member of the Generals Activity board, and a member of Remote Area Medical. "),
+                     tags$p("Ella Moser (second from right) is a Biology major and art history minor on the pre-med track. On campus she is the president of Washington and Lee Brain Exercise Initiative, a member of the Generals Activity board, and a member of Remote Area Medical. "),
                      tags$p("Sarah Stockton (far right) is a Neuroscience and Politics double major on the pre-med track. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Affice and a member of Pi Beta Phi. ")
                  ),
                  
