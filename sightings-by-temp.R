@@ -33,8 +33,16 @@ temp_high_bar <- ggplot(high_temp_summary, aes(x = high_temp_bin, y = n))       
   
   theme_minimal()                                                  +
   
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.background = element_rect(fill = "#F0FFFF"), 
-        plot.background = element_rect(fill = "#F0FFFF"))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 20),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 14),
+        panel.background = element_rect(fill = "#F0FFFF"), 
+        plot.background = element_rect(fill = "#F0FFFF"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 # or create histogram
 ggplot(bigfoot_data, aes(x = temperature_high))                      +
