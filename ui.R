@@ -360,9 +360,9 @@ navbarPage(
                               )
                      ),
                      tags$p("Sophia Taylor (far left) is a Neuroscience and Spanish double major on the pre-med track. On campus she is a Community Assistant for Residence Life, Vice President of Recruitment for Panhellenic Council, President of the LEAD program, President of the Pre-Health club, member of the Leadership Excellence Awards Committee, member of Alpha Delta Pi, Traveller and University store employee, and does research in the Neuroscience Department at W&L. "),
-                     tags$p("Jake Walters (second from left) is a Neuroscience major on the pre-med track. On campus Jake is collecting all the frat infinity stones: Phi delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, and is a Sustainability intern."),
+                     tags$p("Jake Walters (second from left) is a Neuroscience major on the pre-med track. On campus he is collecting all the frat infinity stones: Phi delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, and is a Sustainability intern."),
                      tags$p("Ella Moser (Second from right)"),
-                     tags$p("Sarah Stockton (far right)")
+                     tags$p("Sarah Stockton (far right) is a Neuroscience and Politics double major on the pre-med track. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Affice and a member of Pi Beta Phi. ")
                  ),
                  
                  # What We Offer
@@ -387,7 +387,7 @@ navbarPage(
                  
                  # Contact/Creator Info
                  div(style = "margin-bottom: 30px;",
-                     tags$h3("About the Creator"),
+                     tags$h3("About the Creation"),
                      tags$p("This application was developed as part of a data visualization project. 
                For questions or feedback, please contact [Gregg Whitworth/gwhitworth@wlu.edu].")
                  ),
