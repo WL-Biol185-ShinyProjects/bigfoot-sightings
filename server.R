@@ -1,6 +1,8 @@
 source("moon_phase_generator.R")
 #For web usage: By placing a link with the text "designed by {Author's Name} from Flaticon" in a visible spot, so the author's authorship is noticeable
 bigfoot_data <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv")
+eloevation_data <- read.csv("")
+# for this data, I deleted the front page that described the data. I edited the numbers so they had no commas or decimal points. I removed any of the non 50 U.S. states (U.S. territories) got the data from here: https://www.statista.com/statistics/1325529/lowest-points-united-states-state/
 
 library(wordcloud)
 library(tm)
