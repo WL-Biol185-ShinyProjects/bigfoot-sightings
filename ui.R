@@ -392,8 +392,7 @@ navbarPage(
                  div(style = "text-align: center; margin-top: 50px; color: #666;",
                      tags$p(tags$em("Last updated: November 2025"))
                  )
-             )
-           )#fluid page for about us
-  )#tabpanel for about us
+             )#fluid page
+           )#tabpanel for about us
+  )#navbar page
   
-#navbarPage
