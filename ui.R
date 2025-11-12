@@ -223,15 +223,15 @@ navbarPage(
   ),
   
   # VISUALIZATIONS
-  tabPanel("Visualizations",
+  tabPanel("Sightings Visualizations",
            fluidPage(
              style = "padding: 20px;",
-             h2("Multiple Visualizations of Bigfoot Sightings", style = "text-align: center; color: #f9ca24; margin-bottom: 30px;"),
+             h2("Visualizations of Bigfoot Sightings by Season, State, and Temperature", style = "text-align: center; color: #f9ca24; margin-bottom: 30px;"),
              
              div(style = "max-width: 1200px; margin: 0 auto;",
                  div(style = "background-color: #2c3e50; padding: 20px; border-radius: 12px; margin-bottom: 20px;",
                      selectInput("plotChoice", "Choose a Plot:",
-                                 choices = c("Sightings by Season", "Sightings by State", "Sightings by Temperature"),
+                                 choices = c("Sightings per Season", "Sightings per State", "Sightings per Temperature"),
                                  width = "100%")
                  ),
                  
@@ -245,7 +245,7 @@ navbarPage(
   ),
   
   # SIGHTINGS AND WEATHER
-  tabPanel("Sightings & Weather",
+  tabPanel("Map of Sightings & Weather",
            fluidPage(
              titlePanel(div(style = "color: #f9ca24; text-align: center; margin-bottom: 30px;", "Bigfoot Sightings & Weather Analysis")),
              

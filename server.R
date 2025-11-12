@@ -95,13 +95,13 @@ function(input, output, session) {
   # making the visualizations for sightings by season, state, and temperature and adding an interactive component
  
   output$selectedPlot <- renderPlot({
-    if(input$plotChoice == "Sightings by Season") {
+    if(input$plotChoice == "Sightings per Season") {
       source("Sightings-per-season-bar.R")
       season_bar
-    } else if(input$plotChoice == "Sightings by State") {
+    } else if(input$plotChoice == "Sightings per State") {
       source("sightings-per-state.R")
       state_bar
-    } else if(input$plotChoice == "Sightings by Temperature") {
+    } else if(input$plotChoice == "Sightings per Temperature") {
       source("sightings-by-temp.R")
       temp_high_bar
     }
@@ -917,7 +917,7 @@ function(input, output, session) {
         panel.background = element_rect(fill = "#1e2742", color = NA),
         text = element_text(color = "#ffffff", size = 12),
         plot.title = element_text(size = 16, face = "bold"),
-        plot.subtitle = element_text(size = 12, color = "#f9ca24"),
+        plot.subtitle = element_text(size = 14, color = "#f9ca24"),
         axis.text = element_text(color = "#ffffff"),
         axis.title = element_text(size = 13, face = "bold"),
         legend.background = element_rect(fill = "#1e2742", color = NA),
