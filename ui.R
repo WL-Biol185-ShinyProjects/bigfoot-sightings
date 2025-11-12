@@ -353,8 +353,22 @@ navbarPage(
                         )
                       )
                )
-             )
+             ),
+                      
+             fluidRow(
+               column(12,
+                      div(class = "box",
+                          h4("Weather Patterns & Bigfoot Sightings Correlations", style = "color: #f9ca24;"),
+                          div(style = "padding: 10px; margin-bottom: 15px; background-color: #1a1a1a; border-radius: 8px;",
+                              tags$p(style = "font-size: 14px; line-height: 1.6; margin: 5px 0;", 
+                                     "These correlation plots examine the relationship between various weather conditions and Bigfoot sighting frequencies. Each plot shows the linear regression analysis with R² values indicating the strength of the relationship.")
+                          ),
+                          plotOutput("weather_correlation_plots", height = "1100px")
+                      )
+               )
+             )              
            )
+         
   ),
   
   # MOON PHASE TRACKER
