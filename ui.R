@@ -1,32 +1,158 @@
 library(shiny)
 library(shinythemes)
 library(leaflet)
-library(leaflet.extras)  # Required for heatmaps!
+library(leaflet.extras)
 library(sf)
 library(dplyr)
 library(lubridate)
 
 navbarPage(
-  "Select a Page to Explore!", # Title of the navigation bar
-  tabPanel(
-    "Home Page", 
-    fluidPage(
-      div(style = "text-align: center;",
-          tags$img(src = "bigfoot-landing-page.jpg", width = "900px"),
-          tags$h1("Welcome to Bigfoot Sightings"),
-          tags$h2("Bigfoot...Fact or Fiction?"),
-          tags$h3("Have you ever wondered where Bigfoot has been found? 
-                    Want to know where to look next? Well, you've come to the right place!")), 
+  title = div(
+    style = "display: flex; align-items: center;",
+    tags$span(style = "font-size: 20px; font-weight: 600; letter-spacing: 0.5px;", "Bigfoot Research Portal")
+  ),
+  windowTitle = "Bigfoot Sightings Database",
+  
+  # Global CSS
+  header = tags$head(
+    tags$style(HTML("
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
       
-      tags$head(
-        tags$style(HTML("
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background-color: #1a1a1a;
+        color: #e4e4e4;
+      }
+      
+      .navbar-default {
+        background-color: #2c3e50;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      }
+      
+      .navbar-default .navbar-brand {
+        color: #ffffff !important;
+        font-weight: 600;
+      }
+      
+      .navbar-default .navbar-nav > li > a {
+        color: #e4e4e4 !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 15px 20px;
+      }
+      
+      .navbar-default .navbar-nav > li > a:hover {
+        color: #ff6b6b !important;
+        background: rgba(255, 107, 107, 0.1) !important;
+      }
+      
+      .navbar-default .navbar-nav > .active > a {
+        background: rgba(249, 202, 36, 0.2) !important;
+        color: #f9ca24 !important;
+      }
+      
+      h1, h2, h3, h4, h5 {
+        font-weight: 600;
+        color: #ffffff;
+      }
+      
+      .well {
+        background-color: #2c3e50;
+        border: 1px solid rgba(78, 205, 196, 0.2);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      }
+      
+      .box {
+        background-color: #2c3e50;
+        border: 1px solid rgba(78, 205, 196, 0.2);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      }
+      
+      .btn-primary {
+        background-color: #4ecdc4;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+      }
+      
+      .btn-primary:hover {
+        background-color: #44a08d;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+      }
+      
+      .btn-danger {
+        background-color: #ff6b6b;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-danger:hover {
+        background-color: #ee5a52;
+        transform: translateY(-2px);
+      }
+      
+      .form-control, .selectize-input {
+        background-color: #1a1a1a;
+        border: 1px solid rgba(78, 205, 196, 0.3);
+        color: #e4e4e4;
+        border-radius: 8px;
+      }
+      
+      .form-control:focus, .selectize-input.focus {
+        border-color: #4ecdc4;
+        box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+        background-color: #1a1a1a;
+      }
+      
+      .selectize-dropdown {
+        background-color: #2c3e50;
+        border: 1px solid rgba(78, 205, 196, 0.3);
+      }
+      
+      .selectize-dropdown-content .option {
+        color: #e4e4e4;
+      }
+      
+      .selectize-dropdown-content .option:hover {
+        background-color: rgba(78, 205, 196, 0.2);
+      }
+      
+      .slider-animate-button {
+        background-color: #4ecdc4 !important;
+        border: none !important;
+      }
+      
+      hr {
+        border-top: 1px solid rgba(78, 205, 196, 0.3);
+      }
+      
+      .leaflet-container {
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      }
+      
+      .info-box {
+        background-color: #1e2742;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        border-left: 4px solid #f9ca24;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      }
+      
       @keyframes slide {
-        0% {
-          left: -100px);
-        }
-        100% {
-          left: 100%;
-        }
+        0% { left: -100px; }
+        100% { left: 100%; }
       }
       
       #moving-image {
@@ -37,45 +163,47 @@ navbarPage(
         z-index: 9999;
       }
     "))
-      ),
-      
+  ),
+  
+  # HOME PAGE
+  tabPanel(
+    "Home",
+    fluidPage(
+      div(style = "text-align: center; padding: 40px 20px;",
+          tags$img(src = "bigfoot-landing-page.jpg", width = "900px", style = "border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);"),
+          tags$h1(style = "margin-top: 30px; font-size: 48px; color: #f9ca24;", "Welcome to Bigfoot Sightings"),
+          tags$h2(style = "color: #ff6b6b; margin-top: 20px;", "Bigfoot...Fact or Fiction?"),
+          tags$h3(style = "color: #e4e4e4; margin-top: 20px; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.6;", 
+                  "Have you ever wondered where Bigfoot has been found? Want to know where to look next? Well, you've come to the right place!")
+      ), 
       
       tags$audio(src = "growl-and-roar-102417.mp3", 
                  autoplay = "autoplay",
                  type = "audio/mpeg"),
       
-      
       tags$img(id = "moving-image", 
                src = "new-bigfoot-image-removebg-preview.png",
                width = "300px")
-      
-      # website: https://pixabay.com/sound-effects/search/bigfoot/
-      # https://en.wikipedia.org/wiki/Bigfoot
-      # https://www.shutterstock.com/search/big-foot-creature
     )
-    
-    
-  ), #tabPanel for the main page
+  ),
   
-  # Word cloud for the words most used in the bigfoot sighting reports 
-  tabPanel("WordCloud", 
+  # WORD CLOUD
+  tabPanel("Word Cloud", 
            fluidPage(
-             h2("WordCloud of Words Used to Describe BigFoot Sightings"),
-             theme = shinytheme("darkly"),
-             plotOutput("WordCloud", height = "auto"),
-             
-             hr(),
+             style = "padding: 20px;",
+             h2("Word Cloud of Words Used to Describe Bigfoot Sightings", style = "text-align: center; color: #f9ca24; margin-bottom: 30px;"),
              
              div(
-               style = "background-color: #2c3e50; padding: 20px; border-radius: 8px; margin-bottom: 20px;",
-               h3("What's in the Word Cloud?"),
-               tags$p("Each report made of a Bigfoot sighting had a section available to give an explanation of what the person saw."),
-               tags$p("This word cloud displays the most frequently used words in these descriptions."),
-               tags$p("Let's find out what all of these stories from first eye witnesses have in common...")
+               style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
+               h3("What's in the Word Cloud?", style = "color: #ff6b6b;"),
+               tags$p(style = "font-size: 16px; line-height: 1.6;", "Each report made of a Bigfoot sighting had a section available to give an explanation of what the person saw."),
+               tags$p(style = "font-size: 16px; line-height: 1.6;", "This word cloud displays the most frequently used words in these descriptions."),
+               tags$p(style = "font-size: 16px; line-height: 1.6;", "Let's find out what all of these stories from first eye witnesses have in common...")
              ),
              
              sidebarLayout(
                sidebarPanel(
+                 style = "background-color: #2c3e50; border-radius: 12px; padding: 20px;",
                  sliderInput("max_words",
                              "Select Amount of Words Shown:",
                              min = 1,
@@ -84,210 +212,160 @@ navbarPage(
                              step = 1)
                ),
                mainPanel(
-                 plotOutput("wordcloud")
+                 div(style = "background-color: #1a1a1a; border-radius: 12px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
+                     plotOutput("WordCloud", height = "600px")
+                 )
                ) 
              )
-             
-           )#fluidPage for wordcloud
-  ),#tabPanel for the word cloud
+           )
+  ),
   
-  tabPanel("Visualizations for Bigfoot Sightings",
+  # VISUALIZATIONS
+  tabPanel("Visualizations",
            fluidPage(
-             h3("Multiple Visualizations of Bigfoot Sightings"), 
-             selectInput("plotChoice" , "Choose a Plot:",
-                         choices = c("Sightings by Season", "Sightings by State", "Sightings by Temperature")),
-             hr(),
-             h4("Click on top of any bar to see the number of sightings"),
-             fluidRow(plotOutput("selectedPlot", click = "plots_click")),
-             fluidRow(verbatimTextOutput("plots_text"))
-           )#fluidpage for visualizations page
-           
-  ),#Tabpanel for visualizations page
-  
-  tabPanel("Sightings and Weather",
-           fluidPage(
-             tags$head(
-               tags$style(HTML("
-               body {
-                 background-color: #1a1a1a;
-                 color: white;
-               }
-               .box {
-                 background-color: #2c3e50;
-                 border: none;
-                 padding: 15px;
-                 border-radius: 5px;
-                 margin-bottom: 20px;
-               }
-               .leaflet-container {
-                 background-color: #1a1a1a;
-               }
-               .well {
-                 background-color: #1a1a1a;
-                 border: 1px solid #2c3e50;
-               }
-               h4 {
-                 font-weight: bold;
-                 color: white;
-               }
-               #sighting_count, #year_info {
-                 color: white;
-                 font-size: 14px;
-                 margin: 5px 0;
-               }
-             "))
-             ),
+             style = "padding: 20px;",
+             h2("Multiple Visualizations of Bigfoot Sightings", style = "text-align: center; color: #f9ca24; margin-bottom: 30px;"),
              
-             titlePanel("Bigfoot Sightings & Weather Analysis"),
-             
-             sidebarLayout(
-               sidebarPanel(
-                 width = 3,
-                 
-                 # Bigfoot Sighting Controls
-                 h4("Bigfoot Sightings", style = "color: #ff6b6b;"),
-                 
-                 selectInput("view_mode", "Visualization Mode:",
-                             choices = c("Heatmap" = "heat",
-                                         "Clustered Markers" = "cluster", 
-                                         "Circle Markers" = "circles"),
-                             selected = "heat"),
-                 
-                 conditionalPanel(
-                   condition = "input.view_mode == 'heat'",
-                   sliderInput("heatmap_radius", "Heatmap Radius:",
-                               min = 5, max = 50, value = 25, step = 5),
-                   sliderInput("heatmap_blur", "Heatmap Blur:",
-                               min = 5, max = 50, value = 20, step = 5)
+             div(style = "max-width: 1200px; margin: 0 auto;",
+                 div(style = "background-color: #2c3e50; padding: 20px; border-radius: 12px; margin-bottom: 20px;",
+                     selectInput("plotChoice", "Choose a Plot:",
+                                 choices = c("Sightings by Season", "Sightings by State", "Sightings by Temperature"),
+                                 width = "100%")
                  ),
                  
-                 conditionalPanel(
-                   condition = "input.view_mode == 'circles'",
-                   sliderInput("circle_size", "Circle Size:",
-                               min = 2, max = 15, value = 5, step = 1)
-                 ),
-                 
-                 sliderInput("year_slider", "Year (Cumulative):",
-                             min = 1900, max = 2024, value = 1900, 
-                             step = 1, sep = "",
-                             animate = animationOptions(interval = 300, loop = FALSE)),
-             
-                 
-                 # Weather Data Controls
-                 h4("Weather Layers", style = "color: #4ecdc4; margin-top: 20px;"),
-                 
-                 selectInput("weather_layers", "Show Weather Data:",
-                             choices = c("None" = "none",
-                                         "High Temperature" = "temp_high",
-                                         "Low Temperature" = "temp_low",
-                                         "Precipitation" = "precip",
-                                         "Wind Direction" = "wind",
-                                         "Visibility" = "visibility"),
-                             selected = "none"),
-                 
-                 conditionalPanel(
-                   condition = "input.weather_layers == 'wind'",
-                   selectInput("state_filter", "Wind: Select States",
-                               choices = NULL,
-                               multiple = TRUE,
-                               selectize = TRUE)
-                 ),
-                 
-                 # General Map Controls
-                 h4("Map Options", style = "margin-top: 20px;"),
-                 
-                 selectInput("map_state", "Zoom to State:",
-                             choices = "All States",
-                             selected = "All States"),
-                 
-                 checkboxInput("show_state_boundaries", "Show State Boundaries", 
-                               value = FALSE),
-                 
-                 hr(),
-                 
-                 # Statistics Display
-                 div(style = "padding: 15px; background-color: #2c3e50; border-radius: 5px;",
-                     textOutput("sighting_count"),
-                     textOutput("year_info")
+                 div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
+                     h4("Click on top of any bar to see the number of sightings", style = "color: #f9ca24; text-align: center;"),
+                     plotOutput("selectedPlot", click = "plots_click"),
+                     verbatimTextOutput("plots_text")
                  )
+             )
+           )
+  ),
+  
+  # SIGHTINGS AND WEATHER
+  tabPanel("Sightings & Weather",
+           fluidPage(
+             titlePanel(div(style = "color: #f9ca24; text-align: center; margin-bottom: 30px;", "Bigfoot Sightings & Weather Analysis")),
+             
+             fluidRow(
+               # Left sidebar with controls
+               column(3,
+                      div(style = "background-color: #2c3e50; border-radius: 12px; padding: 20px; position: sticky; top: 20px;",
+                          h4("Bigfoot Sightings", style = "color: #ff6b6b;"),
+                          
+                          selectInput("view_mode", "Visualization Mode:",
+                                      choices = c("Heatmap" = "heat",
+                                                  "Clustered Markers" = "cluster", 
+                                                  "Circle Markers" = "circles"),
+                                      selected = "heat"),
+                          
+                          conditionalPanel(
+                            condition = "input.view_mode == 'heat'",
+                            sliderInput("heatmap_radius", "Heatmap Radius:",
+                                        min = 5, max = 50, value = 25, step = 5),
+                            sliderInput("heatmap_blur", "Heatmap Blur:",
+                                        min = 5, max = 50, value = 20, step = 5)
+                          ),
+                          
+                          conditionalPanel(
+                            condition = "input.view_mode == 'circles'",
+                            sliderInput("circle_size", "Circle Size:",
+                                        min = 2, max = 15, value = 5, step = 1)
+                          ),
+                          
+                          sliderInput("year_slider", "Year (Cumulative):",
+                                      min = 1900, max = 2024, value = 1900, 
+                                      step = 1, sep = "",
+                                      animate = animationOptions(interval = 300, loop = FALSE)),
+                          
+                          h4("Weather Layers", style = "color: #4ecdc4; margin-top: 20px;"),
+                          
+                          selectInput("weather_layers", "Show Weather Data:",
+                                      choices = c("None" = "none",
+                                                  "High Temperature" = "temp_high",
+                                                  "Low Temperature" = "temp_low",
+                                                  "Precipitation" = "precip",
+                                                  "Wind Direction" = "wind",
+                                                  "Visibility" = "visibility"),
+                                      selected = "none"),
+                          
+                          conditionalPanel(
+                            condition = "input.weather_layers == 'wind'",
+                            selectInput("state_filter", "Wind: Select States",
+                                        choices = NULL,
+                                        multiple = TRUE,
+                                        selectize = TRUE)
+                          ),
+                          
+                          h4("Map Options", style = "margin-top: 20px;"),
+                          
+                          selectInput("map_state", "Zoom to State:",
+                                      choices = "All States",
+                                      selected = "All States"),
+                          
+                          checkboxInput("show_state_boundaries", "Show State Boundaries", 
+                                        value = FALSE),
+                          
+                          hr(),
+                          
+                          div(style = "padding: 15px; background-color: #1a1a1a; border-radius: 8px;",
+                              textOutput("sighting_count"),
+                              textOutput("year_info")
+                          )
+                      )
                ),
                
-               mainPanel(
-                 width = 9,
-                 
-                 div(class = "box",
-                     h4("Interactive Map"),
-                     
-                     # Add instructions here
-                     div(style = "padding: 10px; margin-bottom: 15px; background-color: #000000; border-radius: 5px;",
-                         tags$h4("How to Use This Map"),
-
-                         tags$p("The first option in the dropdown that comes up is the heat map. This is demonstrating the sightings of Bigfoot across the United States using color gradients to show density; the more prevelent, the more red. 
-                                Next is the Clustered markers, which is demonstrating individual sightings grouped as circles with an exact number per cluster. 
-                                Last is circle markers, which show the exact points on the map where Bigfoot was sighted. If you click on a point, the observation pops up for you to read. 
-                                For the weather layers: If you click on high temperature, it is showing a a gradient of the high temperature (the darker the red the warmer) for that day of the sighting. Similarly, with low temperature the darker the blue the colder.
-                                Precipitation is showing what was occuring for that day for example: raining or snowing and how much.
-                                Wind direction is shown through the direction of the arrows that pop up. Please select a specific state to not overcrowd the map.
-                                Visibility is shown through the transparency or opaqueness of the circle. 
-                                If you click on any of the points when looking at weather, it will show the county and the respective weather information."),
-                         tags$p("The first visualization option in the dropdown is a Heat Map. This demonstrates the Bigfoot sightings across the United States using color gradients to show density; the more sightings there are, the more red the map appears."), 
-                         tags$p("The second option in the dropdown is Clustered Markers. This demonstrates multiple sightings within the same general area grouped as circles with an exact number of sightings per circle."),
-                         tags$p("The third option in nthe dropdown is Circle Markers. This demonstrates the exact points on the map where a Bigfoot sighting is recorded. If you click on a point, the observation description pops up for you to read."), 
-                         tags$h4("Weather Layers description:"),
-                         tags$p("Clicking on High Temperature shows a gradient of the high temperature on the respective day of a sighting (the darker the red, the warmer).")                 ,
-                         tags$p("Clicking on Low Temperature shows a gradient of the low temperature on the respective day of a sighting (the darker the blue, the colder).")                  ,
-                         tags$p("Clicking on Precipitation shows the type of precipitative weather on the respective day of a sighting (for example: rain, snow, and the total amount).")      ,
-                         tags$p("Clicking on Wind Direction shows the direction the wind on the respective day of a sighting (shown by arrows).")                                              ,
-                         tags$p("Clicking on Visibility showns the visibility on the respective day of a sighting (shown by transparency of the circle; the more opaque, the less visible).")  ,
-                         tags$p("Please select a specific state for clearer visualization.")                                                                                                   ,
-                         tags$p("If you click on any of the points when looking at weather, the map will show the county and the respective weather information.")                             ,
-
-                     ),
-                     
-                     leafletOutput("map", height = "600px")
-                 ),
-                 
-                 fluidRow(
-                   column(8,
-                          div(class = "box",
-                              h4("Sightings Timeline"),
-                              plotOutput("timeline_plot", height = "300px")
-                          )
-                   ),
-                   column(4,
-                          div(class = "box",
-                              h4("Legend"),
-                              htmlOutput("legend_info")
-                          )
-                   )
-                 )
+               # Main content area
+               column(9,
+                      div(class = "box",
+                          h4("Interactive Map", style = "color: #f9ca24;"),
+                          
+                          div(style = "padding: 15px; margin-bottom: 15px; background-color: #1a1a1a; border-radius: 8px;",
+                              tags$h4("How to Use This Map", style = "color: #ff6b6b;"),
+                              tags$p(style = "font-size: 14px; line-height: 1.6;", strong("Heat Map:"), " Demonstrates Bigfoot sightings across the United States using color gradients to show density; the more sightings, the more red the map appears."), 
+                              tags$p(style = "font-size: 14px; line-height: 1.6;", strong("Clustered Markers:"), " Demonstrates multiple sightings within the same area grouped as circles with exact counts."),
+                              tags$p(style = "font-size: 14px; line-height: 1.6;", strong("Circle Markers:"), " Shows exact sighting locations. Click on a point to read the observation description."), 
+                              tags$h4("Weather Layers:", style = "color: #f9ca24; margin-top: 15px;"),
+                              tags$p(style = "font-size: 14px; line-height: 1.6;", strong("High Temperature:"), " Gradient showing temperature (darker red = warmer)."),
+                              tags$p(style = "font-size: 14px; line-height: 1.6;", strong("Low Temperature:"), " Gradient showing temperature (darker blue = colder)."),
+                              tags$p(style = "font-size: 14px; line-height: 1.6;", strong("Precipitation:"), " Shows weather type and amount on sighting days."),
+                              tags$p(style = "font-size: 14px; line-height: 1.6;", strong("Wind Direction:"), " Arrows showing wind direction. Select specific states for clarity."),
+                              tags$p(style = "font-size: 14px; line-height: 1.6;", strong("Visibility:"), " Circle transparency indicates visibility (more opaque = less visible).")
+                          ),
+                          
+                          leafletOutput("map", height = "600px")
+                      ),
+                      
+                      fluidRow(
+                        column(8,
+                               div(class = "box",
+                                   h4("Sightings Timeline", style = "color: #f9ca24;"),
+                                   plotOutput("timeline_plot", height = "300px")
+                               )
+                        ),
+                        column(4,
+                               div(class = "box",
+                                   h4("Legend", style = "color: #f9ca24;"),
+                                   htmlOutput("legend_info")
+                               )
+                        )
+                      )
                )
              )
            )
-  ),#tabPanel for Sightings and Weather
+  ),
   
-  tabPanel("Moon Phase Tracker for Bigfoot Sightings",
+  # MOON PHASE TRACKER
+  tabPanel("Moon Phase Tracker",
            fluidPage(
-             tags$head(
-               tags$style(HTML("
-      body { background-color: #0a0e27; color: #ffffff; }
-      .well { background-color: #1e2742; border: none; }
-      h2, h3, h4 { color: #f9ca24; }
-      .info-box { 
-        background-color: #1e2742; 
-        padding: 15px; 
-        border-radius: 5px; 
-        margin: 10px 0;
-        border-left: 4px solid #f9ca24;
-      }
-    "))
-             ),
+             style = "background-color: #0a0e27;",
              
-             titlePanel("Bigfoot Sightings by Moon Phase"),
+             titlePanel(div(style = "color: #f9ca24; text-align: center;", "Bigfoot Sightings by Moon Phase")),
              
              sidebarLayout(
                sidebarPanel(
-                 h4("Animation Controls"),
+                 style = "background-color: #1e2742; border-radius: 12px; padding: 20px;",
+                 h4("Animation Controls", style = "color: #f9ca24;"),
                  actionButton("animate", "Animate Through Phases", 
                               icon = icon("play"),
                               class = "btn-primary btn-lg",
@@ -302,21 +380,21 @@ navbarPage(
                              min = 1, max = 20, value = 10, step = 1),
                  hr(),
                  div(class = "info-box",
-                     h4("Current Phase:"),
+                     h4("Current Phase:", style = "color: #f9ca24;"),
                      textOutput("phase_name")
                  ),
                  div(class = "info-box",
-                     h4("Sightings in Current Phase:"),
+                     h4("Sightings in Current Phase:", style = "color: #f9ca24;"),
                      textOutput("current_sightings")
                  ),
                  hr(),
                  div(class = "info-box",
-                     h4("Most Sightings:"),
+                     h4("Most Sightings:", style = "color: #f9ca24;"),
                      textOutput("most_sightings_phase"),
                      textOutput("most_sightings_count")
                  ),
                  div(class = "info-box",
-                     h4("Least Sightings:"),
+                     h4("Least Sightings:", style = "color: #f9ca24;"),
                      textOutput("least_sightings_phase"),
                      textOutput("least_sightings_count")
                  )
@@ -325,74 +403,92 @@ navbarPage(
                mainPanel(
                  plotOutput("moon_plot", height = "500px"),
                  hr(),
-                 h3("Bigfoot Sightings by Moon Phase"),
+                 h3("Bigfoot Sightings by Moon Phase", style = "color: #f9ca24; text-align: center;"),
                  plotOutput("phase_distribution", height = "300px")
                )
              )
-           )#fluidPage for moonphase tracker
-           
-  ),#tabPanel for moonphase tracker, 
-  #about us page,
+           )
+  ),
+  
+  # TOPOGRAPHIC MAP
+  tabPanel("Topographic Map",
+           fluidPage(
+             div(style = "background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);",
+                 h2("United States Elevation & Bigfoot Analysis", style = "margin: 0;"),
+                 p("Explore topographic elevation and Bigfoot sightings across the 50 states", 
+                   style = "margin: 10px 0 0 0; opacity: 0.9; font-size: 16px;")
+             ),
+             
+             div(style = "background-color: #2c3e50; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;",
+                 p(paste("Interactive topographic map showing", nrow(bigfoot_data), "Bigfoot sightings across the United States"),
+                   style = "margin: 0; font-size: 16px;")
+             ),
+             
+             leafletOutput("topographic_map", height = "700px"),
+             
+             div(style = "margin-top: 20px; padding: 30px; background-color: #2c3e50; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);",
+                 h3("Statistical Analysis: Elevation vs. Bigfoot Sightings", style = "margin-top: 0; color: #f9ca24;"),
+                 uiOutput("analysis_output"),
+                 div(style = "margin-top: 20px; background-color: #1a1a1a; padding: 20px; border-radius: 12px;",
+                     plotOutput("correlation_plot", height = "400px")
+                 )
+             ),
+             
+             div(style = "margin-top: 20px; padding: 20px; background-color: #2c3e50; border-radius: 12px;",
+                 h4("About This Map", style = "color: #f9ca24;"),
+                 p(style = "font-size: 15px; line-height: 1.6;", "This interactive map displays topographic information for the United States along with documented Bigfoot sighting locations."),
+                 p(style = "font-size: 15px; line-height: 1.6;", strong("Features:"), " Each blue dot represents a reported Bigfoot sighting. Click on any dot to see its exact coordinates. The OpenTopoMap background provides detailed topographic visualization including contour lines and terrain shading."),
+                 p(style = "font-size: 15px; line-height: 1.6;", strong("Data Sources:"), " OpenTopoMap tiles for topographic features and filtered_bigfoot_data.csv for sighting locations.")
+             )
+           )
+  ),
+  
+  # ABOUT US
   tabPanel("About Us",
            fluidPage(
-             div(style = "max-width: 900px; margin: 0 auto; padding: 40px 20px;",
+             style = "padding: 40px 20px;",
+             div(style = "max-width: 1000px; margin: 0 auto;",
                  
-                 # Header
-                 div(style = "text-align: center; margin-bottom: 40px;",
-                     tags$h1("About Us"),
-                    
+                 div(style = "text-align: center; margin-bottom: 50px;",
+                     tags$h1(style = "color: #f9ca24; font-size: 48px;", "About Us")
                  ),
                  
-                 # Project Description
-                 div(style = "margin-bottom: 30px;",
-                     tags$h3("About the Creators"),
-                     tags$p("As science majors, our group wanted to branch out of our typical realm and branch into something more mythical, Bigfoot. Or actually.... maybe more realistic?
-                             Being able to research without having to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
-                              div(style = "text-align: center;",
-                                  tags$img(src = "Bigfoot_group.png", width = "600px")
-                              )
+                 div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
+                     tags$h3("About the Creators", style = "color: #ff6b6b; margin-bottom: 20px;"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "As science majors, our group wanted to branch out of our typical realm and branch into something more mythical, Bigfoot. Or actually.... maybe more realistic? Being able to research without having to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
+                     div(style = "text-align: center; margin: 30px 0;",
+                         tags$img(src = "Bigfoot_group.png", width = "600px", style = "border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);")
                      ),
-                     tags$p("Sophia Taylor (far left) is a Neuroscience and Spanish double major on the pre-med track. On campus she is a Community Assistant for Residence Life, Vice President of Recruitment for Panhellenic Council, President of the LEAD program, President of the Pre-Health club, member of the Leadership Excellence Awards Committee, member of Alpha Delta Pi, Traveller and University store employee, and does research in the Neuroscience Department at W&L. "),
-                     tags$p("Jake Walters (second from left) is a Neuroscience major on the pre-med track. On campus he is collecting all the frat infinity stones: Phi delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, logistics chair of Remote Area Medical, and is a Sustainability intern."),
-                     tags$p("Ella Moser (second from right) is a Biology major and art history minor on the pre-med track. On campus she is the president of Washington and Lee Brain Exercise Initiative, a member of the Generals Activity board, and a member of Remote Area Medical. "),
-                     tags$p("Sarah Stockton (far right) is a Neuroscience and Politics double major on the pre-med track. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Affice and a member of Pi Beta Phi. "),
-                     tags$p("Ella Moser (Second from right) is a Biology major and art history minor on the pre-med track. On campus she is the president of Washington and Lee Brain Exercise Initiative, a member of the Generals Activity board, and a member of Remote Area Medical. "),
-                     tags$p("Sarah Stockton (far right) is a Neuroscience and Politics double major on the pre-med track. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Office and a member of Pi Beta Phi. ")
-
+                     tags$p(style = "font-size: 15px; line-height: 1.7; margin-top: 20px;", strong("Sophia Taylor (far left)"), " is a Neuroscience and Spanish double major on the pre-med track. On campus she is a Community Assistant for Residence Life, Vice President of Recruitment for Panhellenic Council, President of the LEAD program, President of the Pre-Health club, member of the Leadership Excellence Awards Committee, member of Alpha Delta Pi, Traveller and University store employee, and does research in the Neuroscience Department at W&L."),
+                     tags$p(style = "font-size: 15px; line-height: 1.7;", strong("Jake Walters (second from left)"), " is a Neuroscience major on the pre-med track. On campus he is collecting all the frat infinity stones: Phi delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, logistics chair of Remote Area Medical, and is a Sustainability intern."),
+                     tags$p(style = "font-size: 15px; line-height: 1.7;", strong("Ella Moser (second from right)"), " is a Biology major and art history minor on the pre-med track. On campus she is the president of Washington and Lee Brain Exercise Initiative, a member of the Generals Activity board, and a member of Remote Area Medical."),
+                     tags$p(style = "font-size: 15px; line-height: 1.7;", strong("Sarah Stockton (far right)"), " is a Neuroscience and Politics double major on the pre-med track. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Office and a member of Pi Beta Phi.")
                  ),
                  
-                 # What We Offer
-                 div(style = "margin-bottom: 30px;",
-                     tags$h3("What We Offer"),
-                     tags$ul(
-                       tags$li("Interactive maps showing sighting locations"),
-                       tags$li("Weather data analysis for reported encounters"),
-                       tags$li("Filtering tools to explore patterns and trends"),
-                       tags$li("Detailed information about each sighting report")
+                 div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
+                     tags$h3("What We Offer", style = "color: #f9ca24; margin-bottom: 20px;"),
+                     tags$ul(style = "font-size: 16px; line-height: 1.8;",
+                             tags$li("Interactive maps showing sighting locations"),
+                             tags$li("Weather data analysis for reported encounters"),
+                             tags$li("Filtering tools to explore patterns and trends"),
+                             tags$li("Detailed information about each sighting report")
                      )
                  ),
                  
-                 # Data Sources
-                 div(style = "margin-bottom: 30px;",
-                     tags$h3("Data Sources"),
-                     tags$p("Our data comes from the Bigfoot Field Researchers Organization (BFRO) 
-               database, which contains thousands of reported sightings dating back 
-               several decades. Weather data is sourced from historical meteorological 
-               records.")
+                 div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
+                     tags$h3("Data Sources", style = "color: #f9ca24; margin-bottom: 20px;"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Our data comes from the Bigfoot Field Researchers Organization (BFRO) database, which contains thousands of reported sightings dating back several decades. Weather data is sourced from historical meteorological records.")
                  ),
                  
-                 # Contact/Creator Info
-                 div(style = "margin-bottom: 30px;",
-                     tags$h3("About the Creation"),
-                     tags$p("This application was developed as part of a data visualization project. 
-               For questions or feedback, please contact [Gregg Whitworth/gwhitworth@wlu.edu].")
+                 div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
+                     tags$h3("About the Creation", style = "color: #f9ca24; margin-bottom: 20px;"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "This application was developed as part of a data visualization project. For questions or feedback, please contact Gregg Whitworth / gwhitworth@wlu.edu.")
                  ),
                  
-                 # Footer
-                 div(style = "text-align: center; margin-top: 50px; color: #666;",
+                 div(style = "text-align: center; margin-top: 50px; color: #999;",
                      tags$p(tags$em("Last updated: November 2025"))
                  )
-             )#fluid page
-           )#tabpanel for about us
-  )#navbar page
-  
+             )
+           )
+  )
+)

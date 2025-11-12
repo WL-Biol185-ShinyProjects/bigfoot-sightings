@@ -2,7 +2,40 @@ source("moon_phase_generator.R")
 #For web usage: By placing a link with the text "designed by {Author's Name} from Flaticon" in a visible spot, so the author's authorship is noticeable
 bigfoot_data <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv")
 
-# for this data, I deleted the front page that described the data. I edited the numbers so they had no commas or decimal points. I removed any of the non 50 U.S. states (U.S. territories) got the data from here: https://www.statista.com/statistics/1325529/lowest-points-united-states-state/
+
+
+
+
+
+# for the elevation data, I deleted the front page that described the data. I edited the numbers so they had no commas or decimal points. I removed any of the non 50 U.S. states (U.S. territories) got the data from here: https://www.statista.com/statistics/1325529/lowest-points-united-states-state/
+
+# Pre-load Bigfoot sighting data
+bigfoot_data_for_topographic_map <- read.csv("filtered_data_lat_long_state")
+
+
+# Pre-load elevation data
+elevation_data <- read.csv("elevation_data.csv")
+message("Loaded elevation data")
+
+# Calculate number of sightings per state
+sightings_per_state <- as.data.frame(table(bigfoot_data$state))
+colnames(sightings_per_state) <- c("States", "Sightings")
+
+# Merge with elevation data
+analysis_data <- merge(elevation_data, sightings_per_state, by = "States")
+
+# Run linear regression
+lm_model <- lm(Sightings ~ Average.Elevation, data = analysis_data)
+lm_summary <- summary(lm_model)
+
+# Extract key statistics
+r_squared <- round(lm_summary$r.squared, 4)
+p_value <- round(lm_summary$coefficients[2, 4], 4)
+slope <- round(lm_summary$coefficients[2, 1], 6)
+
+message(paste("R-squared:", r_squared, "| P-value:", p_value, "| Slope:", slope))
+#LINES 12-36 FOR TOPOGRAPHIC MAP AND DATA
+
 
 library(wordcloud)
 library(tm)
@@ -831,5 +864,105 @@ function(input, output, session) {
   align = 'c',
   bg = "#1e2742",
   color = "#ffffff")
+  
+  # Base map with OpenTopoMap and Bigfoot sightings
+  output$topographic_map <- renderLeaflet({
+    leaflet(bigfoot_data_for_topographic_map) %>%
+      setView(lng = -98.5795, lat = 39.8283, zoom = 4) %>%
+      addProviderTiles(providers$OpenTopoMap) %>%
+      addCircleMarkers(
+        lng = ~longitude,
+        lat = ~latitude,
+        radius = 4,
+        color = "#0000FF",
+        fillColor = "#4169E1",
+        fillOpacity = 0.7,
+        stroke = TRUE,
+        weight = 1,
+        popup = ~paste("Bigfoot Sighting<br>",
+                       "Lat:", round(latitude, 4), "<br>",
+                       "Lon:", round(longitude, 4))
+      )
+  })
+  
+  # Render analysis output
+  output$analysis_output <- renderUI({
+    tagList(
+      fluidRow(
+        column(4,
+               div(style = "text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; margin: 5px;",
+                   h4(style = "margin: 5px 0;", "R-squared"),
+                   p(style = "font-size: 24px; font-weight: bold; margin: 5px 0;", r_squared),
+                   p(style = "font-size: 12px; margin: 5px 0; opacity: 0.9;", 
+                     "Proportion of variance explained")
+               )
+        ),
+        column(4,
+               div(style = "text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; margin: 5px;",
+                   h4(style = "margin: 5px 0;", "P-value"),
+                   p(style = "font-size: 24px; font-weight: bold; margin: 5px 0;", p_value),
+                   p(style = "font-size: 12px; margin: 5px 0; opacity: 0.9;", 
+                     ifelse(p_value < 0.05, "Statistically significant", "Not statistically significant"))
+               )
+        ),
+        column(4,
+               div(style = "text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; margin: 5px;",
+                   h4(style = "margin: 5px 0;", "Slope"),
+                   p(style = "font-size: 24px; font-weight: bold; margin: 5px 0;", slope),
+                   p(style = "font-size: 12px; margin: 5px 0; opacity: 0.9;", 
+                     "Sightings per foot of elevation")
+               )
+        )
+      ),
+      p(style = "margin-top: 15px; font-size: 14px; opacity: 0.9;",
+        strong("Interpretation: "), 
+        if(p_value < 0.05) {
+          paste("There is a statistically significant relationship between state elevation and Bigfoot sightings. ",
+                ifelse(slope > 0, 
+                       "Higher elevation states tend to have more sightings.", 
+                       "Higher elevation states tend to have fewer sightings."))
+        } else {
+          "There is no statistically significant relationship between state elevation and Bigfoot sightings."
+        }
+      )
+    )
+  })
+  
+  # Render correlation plot
+  output$correlation_plot <- renderPlot({
+    par(mar = c(5, 5, 3, 2))
+    plot(analysis_data$Average.Elevation, analysis_data$Sightings,
+         xlab = "Average State Elevation (feet)",
+         ylab = "Number of Bigfoot Sightings",
+         main = "Correlation between Elevation and Bigfoot Sightings",
+         pch = 19,
+         col = "#4169E1",
+         cex = 1.5,
+         cex.lab = 1.2,
+         cex.main = 1.3)
+    
+    # Add regression line
+    abline(lm_model, col = "#D7191C", lwd = 2)
+    
+    # Add state labels
+    text(analysis_data$Average.Elevation, analysis_data$Sightings,
+         labels = analysis_data$States,
+         pos = 3,
+         cex = 0.7,
+         col = "#333333")
+    
+    # Add legend with statistics
+    legend("topright",
+           legend = c(
+             paste("R² =", r_squared),
+             paste("p-value =", p_value),
+             paste("Slope =", slope)
+           ),
+           bty = "n",
+           cex = 1.1)
+    
+    # Add grid
+    grid(col = "gray80", lty = "dotted")
+  })
   
 }
