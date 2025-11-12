@@ -864,6 +864,10 @@ function(input, output, session) {
   bg = "#1e2742",
   color = "#ffffff")
   
+  # ============================================
+  # Topographic map 
+  # ============================================
+  
   # Base map with OpenTopoMap and Bigfoot sightings
   output$topographic_map <- renderLeaflet({
     leaflet(bigfoot_data_for_topographic_map) %>%
@@ -883,7 +887,7 @@ function(input, output, session) {
                        "Lon:", round(longitude, 4))
       )
   })
-  
+
   # Render analysis output
   output$analysis_output <- renderUI({
     tagList(
