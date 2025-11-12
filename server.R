@@ -632,6 +632,7 @@ function(input, output, session) {
     ")
   })
   
+  
   # Weather Pattern Correlation Plots
   output$weather_correlation_plots <- renderPlot({
     bigfoot_data_clean <- read.csv("bigfoot_data_clean.csv")
@@ -645,13 +646,19 @@ function(input, output, session) {
     lm_cloud <- lm(sightings ~ cloud_cover, data = cloud_summary)
     
     cloud_cover_plot <- ggplot(cloud_summary, aes(x = cloud_cover, y = sightings)) +
-      geom_point(size = 3, color = "#0047AB")                                      +
-      geom_smooth(method = "lm", se = TRUE, color = "black")                       +
+      geom_point(size = 3, color = "#0047AB") +
+      geom_smooth(method = "lm", se = TRUE, color = "black") +
       labs(title = paste("Cloud Cover vs. Sightings\nR² =",
                          round(summary(lm_cloud)$r.squared, 3)),
-           x = "Cloud Cover", y = "Number of Sightings")             +
-      theme_minimal() 
-    
+           x = "Cloud Cover", y = "Number of Sightings") +
+      theme_minimal() +
+      theme(
+        plot.title = element_text(size = 16),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12)
+      )
     
     
     # 2. Precipitation vs Sightings
@@ -662,14 +669,19 @@ function(input, output, session) {
     lm_precip <- lm(sightings ~ precip_intensity, data = precip_summary)
     
     precip_intensity_plot <- ggplot(precip_summary, aes(x = precip_intensity, y = sightings)) +
-      geom_point(size = 3, color = "#0047AB")                                                 +
-      geom_smooth(method = "lm", se = TRUE, color = "black")                                  +
+      geom_point(size = 3, color = "#0047AB") +
+      geom_smooth(method = "lm", se = TRUE, color = "black") +
       labs(title = paste("Precipitation vs Sightings\nR² =", 
                          round(summary(lm_precip)$r.squared, 3)),
-           x = "Precipitation Intensity", y = "Number of Sightings")                          +
-      theme_minimal()
-    
-    
+           x = "Precipitation Intensity", y = "Number of Sightings") +
+      theme_minimal() +
+      theme(
+        plot.title = element_text(size = 16),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12)
+      )
     
     # 3. Visibility vs Sightings
     vis_summary <- bigfoot_data_clean %>%
@@ -678,14 +690,20 @@ function(input, output, session) {
     
     lm_vis <- lm(sightings ~ visibility, data = vis_summary)
     
-    visibility_plot <- ggplot(vis_summary, aes(x = visibility, y = sightings))        +
-      geom_point(size = 3, color = "#0047AB")                                         +
-      geom_smooth(method = "lm", se = TRUE, color = "black")                          +
+    visibility_plot <- ggplot(vis_summary, aes(x = visibility, y = sightings)) +
+      geom_point(size = 3, color = "#0047AB") +
+      geom_smooth(method = "lm", se = TRUE, color = "black") +
       labs(title = paste("Visibility vs Sightings\nR² =", 
                          round(summary(lm_vis)$r.squared, 3)),
-           x = "Visibility", y = "Number of Sightings")                               +
-      theme_minimal()
-    
+           x = "Visibility", y = "Number of Sightings") +
+      theme_minimal() +
+      theme(
+        plot.title = element_text(size = 16),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12)
+      )
     
     # 4. Weather Condition (categorical) - bar chart
     weather_summary <- bigfoot_data_clean %>%
@@ -695,12 +713,18 @@ function(input, output, session) {
       arrange(desc(sightings))
     
     weather_conditions_plot <- ggplot(weather_summary, aes(x = reorder(conditions, -sightings), 
-                                                           y = sightings))                                              +
-      geom_bar(stat = "identity", fill = "#0047AB")                                                +
+                                                                               y = sightings)) +
+      geom_bar(stat = "identity", fill = "#0047AB") +
       labs(title = "Sightings by Weather Condition",
-           x = "Weather Condition", y = "Number of Sightings")                                     +
-      theme_minimal()                                                                              +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+           x = "Weather Condition", y = "Number of Sightings") +
+      theme_minimal() +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 12),  # X-axis tick labels
+        axis.text.y = element_text(size = 12),                          # Y-axis tick labels
+        axis.title.x = element_text(size = 14),                         # X-axis title
+        axis.title.y = element_text(size = 14),                         # Y-axis title
+        plot.title = element_text(size = 16)                            # Plot title
+      )
     
     
     # Display all plots
