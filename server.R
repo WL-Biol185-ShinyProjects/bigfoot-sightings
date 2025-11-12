@@ -1,5 +1,5 @@
 
-#For web usage: By placing a link with the text "designed by {Author's Name} from Flaticon" in a visible spot, so the author's authorship is noticeable
+
 bigfoot_data_for_words <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv")
 
 
