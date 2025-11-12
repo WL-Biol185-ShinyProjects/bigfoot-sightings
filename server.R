@@ -109,19 +109,19 @@ function(input, output, session) {
   
   output$plots_text <- renderText({
     if(!is.null(input$plots_click)) {
-      if(input$plotChoice == "Sightings by Season") {
+      if(input$plotChoice == "Sightings per Season") {
         source("Sightings-per-season-bar.R")
         keepRows <- round(input$plots_click$x) == as.numeric(bigfoot_season$season)
         rows <- bigfoot_season[keepRows,]
         return(paste("Sightings:", rows$n))
         
-      } else if(input$plotChoice == "Sightings by State") {
+      } else if(input$plotChoice == "Sightings per State") {
         source("sightings-per-state.R")
         keepRows <- round(input$plots_click$x) == as.numeric(number_sightings_per_state$state)
         rows <- number_sightings_per_state[keepRows, ]
         return(paste("Sightings:", rows$n))
         
-      } else if(input$plotChoice == "Sightings by Temperature") {
+      } else if(input$plotChoice == "Sightings per Temperature") {
         source("sightings-by-temp.R")
         keepRows <- round(input$plots_click$x) == as.numeric(high_temp_summary$high_temp_bin)
         rows <- high_temp_summary[keepRows, ]
