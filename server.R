@@ -1,7 +1,6 @@
-source("moon_phase_generator.R")
-#For web usage: By placing a link with the text "designed by {Author's Name} from Flaticon" in a visible spot, so the author's authorship is noticeable
-bigfoot_data <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv")
 
+#For web usage: By placing a link with the text "designed by {Author's Name} from Flaticon" in a visible spot, so the author's authorship is noticeable
+bigfoot_data_for_words <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv")
 
 
 
@@ -69,7 +68,7 @@ function(input, output, session) {
     
     removed_words <- c("like", "the", "also", "didnt", "there", "got", "this", "just", "didnt", "one")
     
-    kept_words <- sapply(1:nrow(bigfoot_data),
+    kept_words <- sapply(1:nrow(bigfoot_data_for_words),
                          function(n) {
                            words <- str_split(bigfoot_data$observed[n], "\\s")[[1]]
                            words <- tolower(words)

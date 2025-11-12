@@ -6,6 +6,8 @@ library(sf)
 library(dplyr)
 library(lubridate)
 
+
+
 navbarPage(
   title = div(
     style = "display: flex; align-items: center;",
@@ -403,7 +405,7 @@ navbarPage(
                mainPanel(
                  plotOutput("moon_plot", height = "500px"),
                  hr(),
-                 h3("Bigfoot Sightings by Moon Phase", style = "color: #f9ca24; text-align: center;"),
+                 h3("Bigfoot Sightings vs. Moon Brightness", style = "color: #f9ca24; text-align: center;"),
                  plotOutput("phase_distribution", height = "300px")
                )
              )
