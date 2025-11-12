@@ -358,7 +358,7 @@ navbarPage(
   ),           # closes "Map of Sightings & Weather" tabPanel
   
 #Sightings & Weather Correlations
-tabPanel("Sightings & Weather Correlations",
+tabPanel("Correlations",
            fluidPage(
              style = "background-color: #0a0e27;",
              
@@ -375,7 +375,7 @@ tabPanel("Sightings & Weather Correlations",
                           plotOutput("weather_correlation_plots", height = "1100px")
                       )
                )
-             )  # <-- ADD THIS to close fluidRow            
+             )  # close fluidRow            
            )
   ),
   

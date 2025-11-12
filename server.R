@@ -3,9 +3,6 @@
 bigfoot_data_for_words <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv")
 
 
-
-
-
 # for the elevation data, I deleted the front page that described the data. I edited the numbers so they had no commas or decimal points. I removed any of the non 50 U.S. states (U.S. territories) got the data from here: https://www.statista.com/statistics/1325529/lowest-points-united-states-state/
 
 # Pre-load Bigfoot sighting data
@@ -1009,7 +1006,6 @@ function(input, output, session) {
                        "Lon:", round(longitude, 4))
       )
   })
-
   # Render analysis output
   output$analysis_output <- renderUI({
     tagList(
