@@ -353,12 +353,21 @@ navbarPage(
                         )
                       )
                )
-             ),
-                      
-             fluidRow(
+             )  # ADD THIS - closes fluidRow
+           )    # closes fluidPage  
+  ),           # closes "Map of Sightings & Weather" tabPanel
+  
+#Sightings & Weather Correlations
+tabPanel("Sightings & Weather Correlations",
+           fluidPage(
+             style = "background-color: #0a0e27;",
+             
+             titlePanel(div(style = "color: #f9ca24; text-align: center;", "Correlations Between Bigfoot Sightings and Weather During Observation")),
+             
+             fluidRow(  # <-- ADD THIS
                column(12,
                       div(class = "box",
-                          h4("Weather Patterns & Bigfoot Sightings Correlations", style = "color: #f9ca24;"),
+                          h4("Weather Patterns & Bigfoot Sightings Correlations", style = "color: #f9ca4;"),
                           div(style = "padding: 10px; margin-bottom: 15px; background-color: #1a1a1a; border-radius: 8px;",
                               tags$p(style = "font-size: 14px; line-height: 1.6; margin: 5px 0;", 
                                      "These correlation plots examine the relationship between various weather conditions and Bigfoot sighting frequencies. Each plot shows the linear regression analysis with R² values indicating the strength of the relationship.")
@@ -366,9 +375,8 @@ navbarPage(
                           plotOutput("weather_correlation_plots", height = "1100px")
                       )
                )
-             )              
+             )  # <-- ADD THIS to close fluidRow            
            )
-         
   ),
   
   # MOON PHASE TRACKER
@@ -508,3 +516,5 @@ navbarPage(
            )
   )
 )
+
+
