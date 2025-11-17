@@ -71,6 +71,59 @@ weather_conditions_plot <- ggplot(weather_summary, aes(x = reorder(conditions, -
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
+# 5. wind speed vs Sightings
+wind_speed_summary <- bigfoot_data_clean %>%
+  group_by(wind_speed) %>%
+  summarise(sightings = n())
+
+lm_wind_speed <- lm(sightings ~ wind_speed, data = wind_speed_summary)
+
+wind_speed_plot <- ggplot(wind_speed_summary, aes(x = wind_speed, y = sightings)) +
+  geom_point(size = 3, color = "#0047AB")                                         +
+  geom_smooth(method = "lm", se = TRUE, color = "black")                          +
+  labs(title = paste("Wind Speed vs. Sightings\nR² =",
+                     round(summary(lm_wind_speed)$r.squared, 3)),
+       x = "Wind Speed", y = "Number of Sightings")                               +
+  theme_minimal() 
+
+
+# 6. Low Temp vs Sightings
+low_temp_summary <- bigfoot_data_clean %>%
+  group_by(temperature_low) %>%
+  summarise(sightings = n())
+
+lm_low_temp <- lm(sightings ~ temperature_low, data = low_temp_summary)
+
+low_temp_plot <- ggplot(low_temp_summary, aes(x = temperature_low, y = sightings)) +
+  geom_point(size = 3, color = "#0047AB")                                         +
+  geom_smooth(method = "lm", se = TRUE, color = "black")                          +
+  labs(title = paste("Low Temperature vs. Sightings\nR² =",
+                     round(summary(lm_low_temp)$r.squared, 3)),
+       x = "Low Temperature", y = "Number of Sightings")                               +
+  theme_minimal() 
+
+
+# 7. High Temp vs Sightings
+high_temp_summary <- bigfoot_data_clean %>%
+  group_by(temperature_high) %>%
+  summarise(sightings = n())
+
+lm_high_temp <- lm(sightings ~ temperature_high, data = high_temp_summary)
+
+high_temp_plot <- ggplot(high_temp_summary, aes(x = temperature_high, y = sightings)) +
+  geom_point(size = 3, color = "#0047AB")                                         +
+  geom_smooth(method = "lm", se = TRUE, color = "black")                          +
+  labs(title = paste("High Temperature vs. Sightings\nR² =",
+                     round(summary(lm_low_temp)$r.squared, 3)),
+       x = "High Temperature", y = "Number of Sightings")                               +
+  theme_minimal() 
+
+
+
+
+
+
+# underneath this line is old code that we may not need
 # Display all plots
 grid.arrange(cloud_cover_plot, precip_intensity_plot, visibility_plot, weather_conditions_plot, ncol = 2)
 
