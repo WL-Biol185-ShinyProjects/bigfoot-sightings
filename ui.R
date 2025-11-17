@@ -338,6 +338,13 @@ navbarPage(
                           leafletOutput("map", height = "600px")
                       ),
                       
+                      # Weather Correlation Plot Section
+                      div(class = "box", style = "margin-top: 20px;",
+                          h4("Weather Correlation Analysis", style = "color: #f9ca24;"),
+                          plotOutput("weather_correlation_scatter_plot", height = "400px"),
+                          verbatimTextOutput("weather_correlation_model_stats")
+                      ),
+                      
                       fluidRow(
                         column(8,
                                div(class = "box",
@@ -353,7 +360,7 @@ navbarPage(
                         )
                       )
                )
-             )  # ADD THIS - closes fluidRow
+             )  # closes fluidRow
            )    # closes fluidPage  
   ),           # closes "Map of Sightings & Weather" tabPanel
   
