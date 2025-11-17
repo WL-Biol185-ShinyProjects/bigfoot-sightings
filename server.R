@@ -429,6 +429,22 @@ function(input, output, session) {
         )
     }
     
+    #adding year back in 
+    # Sighting count output
+    output$sighting_count <- renderText({
+      data <- filtered_sf()
+      paste("Total Sightings:", format(nrow(data), big.mark = ","))
+    })
+    
+    # Year info output
+    output$year_info <- renderText({
+      data <- filtered_sf()
+      if(nrow(data) > 0) {
+        paste("Showing data up to:", input$year_slider)
+      } else {
+        "No data available"
+      }
+    })
     # Add Weather layers
     if(nrow(weather_df) > 0) {
       
