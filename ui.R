@@ -454,7 +454,7 @@ tabPanel("Correlations",
                  h3("Statistical Analysis: Elevation vs. Bigfoot Sightings", style = "margin-top: 0; color: #f9ca24;"),
                  uiOutput("analysis_output"),
                  div(style = "margin-top: 20px; background-color: #1a1a1a; padding: 20px; border-radius: 12px;",
-                     plotOutput("correlation_plot", height = "400px")
+                     plotOutput("correlation_plot", height = "800px")
                  )
              ),
              
