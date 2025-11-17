@@ -465,7 +465,7 @@ tabPanel("Correlations",
                  p(style = "font-size: 15px; line-height: 1.6;", strong("Data Sources:"), " OpenTopoMap tiles for topographic features and filtered_bigfoot_data.csv for sighting locations.")
              )
            )
-  ),
+  ), 
   
   # ABOUT US
   tabPanel("About Us",
@@ -516,4 +516,3 @@ tabPanel("Correlations",
            )
   )
 )
-
