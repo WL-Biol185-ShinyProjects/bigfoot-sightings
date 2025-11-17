@@ -705,39 +705,6 @@ function(input, output, session) {
   })
   
   
-  
-  
-  
-  
-  # Weather Correlation Statistics
-  output$correlation_stats <- renderPrint({
-    
-    # Debug print
-    cat("Rendering stats for:", input$weather_layers, "\n")
-    
-    if (input$weather_layers == "precip") {
-      
-      precip_data <- generate_precip_correlation()
-      
-      cat("Precipitation vs. Sightings\n\n")
-      cat("Slope:", format(precip_data$slope, digits = 4), "\n")
-      cat("R-squared:", format(precip_data$r_squared, digits = 4), "\n")
-      cat("P-value:", format.pval(precip_data$p_value, digits = 3), "\n")
-      
-    } else if (input$weather_layers == "visibility") {
-      
-      vis_data <- generate_visibility_correlation()
-      
-      cat("Visibility vs. Sightings\n\n")
-      cat("Slope:", format(vis_data$slope, digits = 4), "\n")
-      cat("R-squared:", format(vis_data$r_squared, digits = 4), "\n")
-      cat("P-value:", format.pval(vis_data$p_value, digits = 3), "\n")
-      
-    } else {
-      cat("No correlation analysis selected\n")
-    }
-  })
-  
   # Legend
   output$legend_info <- renderUI({
     HTML("
