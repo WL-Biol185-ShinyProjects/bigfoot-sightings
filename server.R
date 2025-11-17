@@ -563,9 +563,6 @@ function(input, output, session) {
   
   
   
-  
-  
-  
   # Weather Correlation Plot
   output$correlation_plot <- renderPlot({
     
