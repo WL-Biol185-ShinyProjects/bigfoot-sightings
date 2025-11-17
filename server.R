@@ -1058,9 +1058,10 @@ function(input, output, session) {
          main = "Correlation between Elevation and Bigfoot Sightings",
          pch = 19,
          col = "#4169E1",
-         cex = 1.5,
-         cex.lab = 1.2,
-         cex.main = 1.3)
+         cex = 2.0,
+         cex.lab = 1.8,
+         cex.main = 1.8,
+         cex.axis = 1.4)
     
     # Add regression line
     abline(lm_model, col = "#D7191C", lwd = 2)
@@ -1069,7 +1070,7 @@ function(input, output, session) {
     text(analysis_data$Average.Elevation, analysis_data$Sightings,
          labels = analysis_data$States,
          pos = 3,
-         cex = 0.7,
+         cex = 1.0,
          col = "#333333")
     
     # Add legend with statistics
@@ -1080,7 +1081,7 @@ function(input, output, session) {
              paste("Slope =", slope)
            ),
            bty = "n",
-           cex = 1.1)
+           cex = 1.4)
     
     # Add grid
     grid(col = "gray80", lty = "dotted")
