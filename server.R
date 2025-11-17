@@ -32,7 +32,7 @@ slope <- round(lm_summary$coefficients[2, 1], 6)
 message(paste("R-squared:", r_squared, "| P-value:", p_value, "| Slope:", slope))
 #LINES 12-36 FOR TOPOGRAPHIC MAP AND DATA
 
-
+#loading the appropriate libraries
 library(wordcloud)
 library(tm)
 library(memoise)
@@ -49,6 +49,7 @@ library(lubridate)
 library(maps)
 library(gridExtra)
 
+# defines the server function in a Shiny application
 function(input, output, session) {
   # Create custom Bigfoot icon
   bigfoot_icon <- makeIcon(
@@ -82,13 +83,10 @@ function(input, output, session) {
     )
   }, height = 600, bg = "transparent")
   
-  
-
   # ============================================
   # VISUALIZATIONS (Season, State, Temperature)
   # ============================================
 
-  
   # making the visualizations for sightings by season, state, and temperature and adding an interactive component
  
   output$selectedPlot <- renderPlot({
@@ -130,7 +128,7 @@ function(input, output, session) {
     }
   })
   
-  
+
   # ============================================
   # SIGHTINGS AND WEATHER MAP
   # ============================================
@@ -140,7 +138,7 @@ function(input, output, session) {
     read.csv("bigfoot_data_clean.csv", stringsAsFactors = FALSE)
   })
   
-  # Convert to SF object with cleaned data
+  # Convert to Simple Features (SF) object with cleaned data
   bigfoot_sf <- reactive({
     df <- bigfoot_observations()
     
@@ -261,7 +259,6 @@ function(input, output, session) {
   
   # Filter weather data based on date range and selected state
   # Filter weather data based on year filters and selected state
-  # Filter weather data based on year filters and selected state
   filtered_weather <- reactive({
     df <- weather_data()
     
@@ -374,7 +371,8 @@ function(input, output, session) {
           group = "Bigfoot Sightings"
         )
     } else if(input$view_mode == "cluster" && nrow(bigfoot_data_clean) > 0) {
-      # Merge observation data - use the reactive directly to avoid join issues
+      
+      # Merge observation data - clustered
       data_with_obs <- bigfoot_data_clean %>%
         mutate(marker_id = paste0("marker_", seq_len(n())))
       
@@ -403,7 +401,8 @@ function(input, output, session) {
           group = "Bigfoot Sightings"
         )
     } else if(input$view_mode == "circles" && nrow(bigfoot_data_clean) > 0) {
-      # Merge observation data
+      
+      # Merge observation data - circles
       data_with_obs <- bigfoot_data_clean %>%
         mutate(marker_id = paste0("marker_", seq_len(n())))
       
@@ -1156,6 +1155,7 @@ function(input, output, session) {
                        "Lon:", round(longitude, 4))
       )
   })
+  
   # Render analysis output
   output$analysis_output <- renderUI({
     tagList(
@@ -1208,9 +1208,10 @@ function(input, output, session) {
          main = "Correlation between Elevation and Bigfoot Sightings",
          pch = 19,
          col = "#4169E1",
-         cex = 1.5,
-         cex.lab = 1.2,
-         cex.main = 1.3)
+         cex = 2.0,
+         cex.lab = 1.8,
+         cex.main = 1.8,
+         cex.axis = 1.4)
     
     # Add regression line
     abline(lm_model, col = "#D7191C", lwd = 2)
@@ -1219,7 +1220,7 @@ function(input, output, session) {
     text(analysis_data$Average.Elevation, analysis_data$Sightings,
          labels = analysis_data$States,
          pos = 3,
-         cex = 0.7,
+         cex = 1.0,
          col = "#333333")
     
     # Add legend with statistics
@@ -1230,7 +1231,7 @@ function(input, output, session) {
              paste("Slope =", slope)
            ),
            bty = "n",
-           cex = 1.1)
+           cex = 1.4)
     
     # Add grid
     grid(col = "gray80", lty = "dotted")
