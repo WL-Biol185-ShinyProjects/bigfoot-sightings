@@ -481,7 +481,7 @@ tabPanel("Topographic Map",
                  
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
                      tags$h3("About the Creators", style = "color: #ff6b6b; margin-bottom: 20px;"),
-                     tags$p(style = "font-size: 16px; line-height: 1.8;", "As science majors, our group wanted to branch out of our typical realm and dip into something more mythical, like Bigfoot. Being able to research without having to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "As science majors, our group wanted to step outside our usual realm and explore a topic that blurs the line between myth and reality; Bigfoot. Being able to research without having to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
                      div(style = "text-align: center; margin: 30px 0;",
                          tags$img(src = "Bigfoot_group.png", width = "600px", style = "border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);")
                      ),
