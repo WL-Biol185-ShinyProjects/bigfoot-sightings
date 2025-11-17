@@ -244,7 +244,7 @@ navbarPage(
            )
   ),
   
-  # SIGHTINGS AND WEATHER
+  # MAP OF SIGHTINGS AND WEATHER
   tabPanel("Map of Sightings & Weather",
            fluidPage(
              titlePanel(div(style = "color: #f9ca24; text-align: center; margin-bottom: 30px;", "Bigfoot Sightings & Weather Analysis")),
@@ -353,7 +353,7 @@ navbarPage(
                         )
                       )
                )
-             )  # ADD THIS - closes fluidRow
+             )  # closes fluidRow
            )    # closes fluidPage  
   ),           # closes "Map of Sightings & Weather" tabPanel
   
@@ -364,7 +364,7 @@ tabPanel("Correlations",
              
              titlePanel(div(style = "color: #f9ca24; text-align: center;", "Correlations Between Bigfoot Sightings and Weather During Observation")),
              
-             fluidRow(  # <-- ADD THIS
+             fluidRow(  
                column(12,
                       div(class = "box",
                           h4("Weather Patterns & Bigfoot Sightings Correlations", style = "color: #f9ca4;"),
@@ -479,7 +479,7 @@ tabPanel("Correlations",
                  
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
                      tags$h3("About the Creators", style = "color: #ff6b6b; margin-bottom: 20px;"),
-                     tags$p(style = "font-size: 16px; line-height: 1.8;", "As science majors, our group wanted to branch out of our typical realm and branch into something more mythical, Bigfoot. Or actually.... maybe more realistic? Being able to research without having to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "As science majors, our group wanted to branch out of our typical realm and dip into something more mythical, like Bigfoot. Or maybe actually.... maybe more realistic? Being able to research without having to read an exhausting scientific paper gave us much joy, and we hope you got a similar amount of joy going through our website!"),
                      div(style = "text-align: center; margin: 30px 0;",
                          tags$img(src = "Bigfoot_group.png", width = "600px", style = "border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);")
                      ),
@@ -516,5 +516,4 @@ tabPanel("Correlations",
            )
   )
 )
-
 
