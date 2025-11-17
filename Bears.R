@@ -1,5 +1,9 @@
 library(tidyverse)
 library(ggplot2)
+library(sf)
+
+install.packages(c("tigris"))
+library(tigris)
 
 # Grouping Bigfoot sightings by State
 
@@ -8,7 +12,11 @@ number_sightings_per_state <- bigfoot_data %>%
 
 # Grouping Bear Sightings by State
 
-bear_sightings <- read.csv("BearSightingsdata.csv")
+bear_sightings <- read.csv("BearSightingsdata.csv") %>%
+  rename(
+    lat = decimalLatitude,
+    lon = decimalLongitude
+  )
 bear_state <- bear_sightings %>%
   count(stateProvince) %>%
   rename(state = stateProvince)
@@ -43,3 +51,16 @@ ggplot(merged_bigfoot_bear, aes(x = bear_obs, y = bigfoot_obs)) +
     axis.text.x = element_text(size = 12),
     axis.text.y = element_text(size = 12)
   )
+
+# Attempting a county level regression
+
+counties <- counties(cb = TRUE, resolution = "20m", year = 2022)
+counties <- counties %>%
+  select(STATEFP, COUNTYFP, NAME, NAMELSAD, STUSPS) %>%
+  st_transform(4326)
+
+points <- st_as_sf(bear_sightings, coords = c("lon" , "lat"), crs = 4326)
+results <- st_join(points, counties)
+results[, c( "NAME", "STUSPS")]
+
+
