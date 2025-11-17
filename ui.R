@@ -434,39 +434,33 @@ tabPanel("Correlations",
            )
   ),
   
-  # TOPOGRAPHIC MAP
-  tabPanel("Topographic Map",
-           fluidPage(
-             div(style = "background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);",
-                 h2("United States Elevation & Bigfoot Analysis", style = "margin: 0;"),
-                 p("Explore topographic elevation and Bigfoot sightings across the 50 states", 
-                   style = "margin: 10px 0 0 0; opacity: 0.9; font-size: 16px;")
-             ),
-             
-             div(style = "background-color: #2c3e50; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;",
-                 p(paste("Interactive topographic map showing", nrow(bigfoot_data), "Bigfoot sightings across the United States"),
-                   style = "margin: 0; font-size: 16px;")
-             ),
-             
-             leafletOutput("topographic_map", height = "700px"),
-             
-             div(style = "margin-top: 20px; padding: 30px; background-color: #2c3e50; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);",
-                 h3("Statistical Analysis: Elevation vs. Bigfoot Sightings", style = "margin-top: 0; color: #f9ca24;"),
-                 uiOutput("analysis_output"),
-                 div(style = "margin-top: 20px; background-color: #1a1a1a; padding: 20px; border-radius: 12px;",
-                     plotOutput("correlation_plot", height = "800px")
-                 )
-             ),
-             
-             div(style = "margin-top: 20px; padding: 20px; background-color: #2c3e50; border-radius: 12px;",
-                 h4("About This Map", style = "color: #f9ca24;"),
-                 p(style = "font-size: 15px; line-height: 1.6;", "This interactive map displays topographic information for the United States along with documented Bigfoot sighting locations."),
-                 p(style = "font-size: 15px; line-height: 1.6;", strong("Features:"), " Each blue dot represents a reported Bigfoot sighting. Click on any dot to see its exact coordinates. The OpenTopoMap background provides detailed topographic visualization including contour lines and terrain shading."),
-                 p(style = "font-size: 15px; line-height: 1.6;", strong("Data Sources:"), " OpenTopoMap tiles for topographic features and filtered_bigfoot_data.csv for sighting locations.")
-             )
+# TOPOGRAPHIC MAP
+tabPanel("Topographic Map",
+         fluidPage(
+           div(style = "background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);",
+               h2("United States Elevation & Bigfoot Analysis", style = "margin: 0;"),
+               p("Explore topographic elevation and Bigfoot sightings across the 50 states", 
+                 style = "margin: 10px 0 0 0; opacity: 0.9; font-size: 16px;")
+           ),
+           
+           leafletOutput("topographic_map", height = "700px"),
+           
+           div(style = "margin-top: 20px; padding: 30px; background-color: #2c3e50; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);",
+               h3("Statistical Analysis: Elevation vs. Bigfoot Sightings", style = "margin-top: 0; color: #f9ca24;"),
+               uiOutput("analysis_output"),
+               div(style = "margin-top: 20px; background-color: #1a1a1a; padding: 20px; border-radius: 12px;",
+                   plotOutput("correlation_plot", height = "800px")
+               )
+           ),
+           
+           div(style = "margin-top: 20px; padding: 20px; background-color: #2c3e50; border-radius: 12px;",
+               h4("About This Map", style = "color: #f9ca24;"),
+               p(style = "font-size: 15px; line-height: 1.6;", "This interactive map displays topographic information for the United States along with documented Bigfoot sighting locations."),
+               p(style = "font-size: 15px; line-height: 1.6;", strong("Features:"), " Each blue dot represents a reported Bigfoot sighting. Click on any dot to see its exact coordinates. The OpenTopoMap background provides detailed topographic visualization including contour lines and terrain shading."),
+               p(style = "font-size: 15px; line-height: 1.6;", strong("Data Sources:"), " OpenTopoMap tiles for topographic features and filtered_bigfoot_data.csv for sighting locations.")
            )
-  ), 
-  
+         )
+),
   # ABOUT US
   tabPanel("About Us",
            fluidPage(
