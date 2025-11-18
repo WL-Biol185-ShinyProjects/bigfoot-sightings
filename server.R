@@ -4,33 +4,9 @@ bigfoot_data_for_words <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv
 
 
 # for the elevation data, I deleted the front page that described the data. I edited the numbers so they had no commas or decimal points. I removed any of the non 50 U.S. states (U.S. territories) got the data from here: https://www.statista.com/statistics/1325529/lowest-points-united-states-state/
-
-# Pre-load Bigfoot sighting data
-bigfoot_data_for_topographic_map <- read.csv("filtered_data_lat_long_state")
+# https://www.fs.usda.gov/sites/default/files/fs_media/fs_document/publication-15817-usda-forest-service-fia-annual-report-508.pdfgot got tree data from here. Deleted everything else that wasnt a state and only kept the first two columns to keep things organized
 
 
-# Pre-load elevation data
-elevation_data <- read.csv("elevation_data.csv")
-message("Loaded elevation data")
-
-# Calculate number of sightings per state
-sightings_per_state <- as.data.frame(table(bigfoot_data$state))
-colnames(sightings_per_state) <- c("States", "Sightings")
-
-# Merge with elevation data
-analysis_data <- merge(elevation_data, sightings_per_state, by = "States")
-
-# Run linear regression
-lm_model <- lm(Sightings ~ Average.Elevation, data = analysis_data)
-lm_summary <- summary(lm_model)
-
-# Extract key statistics
-r_squared <- round(lm_summary$r.squared, 4)
-p_value <- round(lm_summary$coefficients[2, 4], 4)
-slope <- round(lm_summary$coefficients[2, 1], 6)
-
-message(paste("R-squared:", r_squared, "| P-value:", p_value, "| Slope:", slope))
-#LINES 12-36 FOR TOPOGRAPHIC MAP AND DATA
 
 #loading the appropriate libraries
 library(wordcloud)
@@ -562,144 +538,36 @@ function(input, output, session) {
   })
   
   
-  
-  # Weather Correlation Plot
-  output$correlation_plot <- renderPlot({
+  # Weather Correlation Scatter Plot
+  output$weather_correlation_scatter_plot <- renderPlot({
     
     # Read the data directly
-    bigfoot_data_clean <- read.csv("bigfoot_data_clean.csv")
+    bigfoot_data_clean <- read.csv("bigfoot_data_clean.csv", stringsAsFactors = FALSE)
     
-    if (input$weather_layers == "precip") {
+    # Check if a valid weather layer is selected
+    if (input$weather_layers %in% names(weather_config)) {
       
-      # Generate precipitation summary
-      precip_summary <- bigfoot_data_clean %>%
-        group_by(precip_intensity) %>%
-        summarise(sightings = n())
+      # Get configuration for selected weather variable
+      config <- weather_config[[input$weather_layers]]
       
-      # Calculate linear regression model
-      lm_precip <- lm(sightings ~ precip_intensity, data = precip_summary)
-      r_squared <- summary(lm_precip)$r.squared
-      p_value <- summary(lm_precip)$coefficients[2, 4]
-      slope <- coef(lm_precip)[2]
-      
-      # Create the plot
-      ggplot(precip_summary, aes(x = precip_intensity, y = sightings)) +
-        geom_point(size = 5, color = "#0047AB", alpha = 0.8) +
-        geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
-        labs(
-          title = "Precipitation vs Sightings",
-          subtitle = paste0(
-            "R² = ", round(r_squared, 3), 
-            " | Slope = ", round(slope, 2),
-            " | p-value = ", format.pval(p_value, digits = 3)
-          ),
-          x = "Precipitation Intensity", 
-          y = "Number of Sightings"
-        ) +
-        theme_minimal() +
-        theme(
-          plot.background = element_rect(fill = "#0a0e27", color = NA),
-          panel.background = element_rect(fill = "#1e2742", color = NA),
-          text = element_text(color = "#ffffff", size = 12),
-          plot.title = element_text(size = 16, face = "bold", color = "#ffffff"),
-          plot.subtitle = element_text(size = 14, color = "#f9ca24"),
-          axis.text = element_text(color = "#ffffff"),
-          axis.title = element_text(size = 13, face = "bold", color = "#ffffff"),
-          panel.grid.major = element_line(color = "#2c3e50", linewidth = 0.5),
-          panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
-        )
-      
-    } else if (input$weather_layers == "visibility") {
-      
-      # Generate visibility summary
-      vis_summary <- bigfoot_data_clean %>%
-        group_by(visibility) %>%
-        summarise(sightings = n())
-      
-      # Calculate linear regression model
-      lm_vis <- lm(sightings ~ visibility, data = vis_summary)
-      r_squared <- summary(lm_vis)$r.squared
-      p_value <- summary(lm_vis)$coefficients[2, 4]
-      slope <- coef(lm_vis)[2]
-      
-      # Create the plot
-      ggplot(vis_summary, aes(x = visibility, y = sightings)) +
-        geom_point(size = 5, color = "#0047AB", alpha = 0.8) +
-        geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
-        labs(
-          title = "Visibility vs Sightings",
-          subtitle = paste0(
-            "R² = ", round(r_squared, 3), 
-            " | Slope = ", round(slope, 2),
-            " | p-value = ", format.pval(p_value, digits = 3)
-          ),
-          x = "Visibility", 
-          y = "Number of Sightings"
-        ) +
-        theme_minimal() +
-        theme(
-          plot.background = element_rect(fill = "#0a0e27", color = NA),
-          panel.background = element_rect(fill = "#1e2742", color = NA),
-          text = element_text(color = "#ffffff", size = 12),
-          plot.title = element_text(size = 16, face = "bold", color = "#ffffff"),
-          plot.subtitle = element_text(size = 14, color = "#f9ca24"),
-          axis.text = element_text(color = "#ffffff"),
-          axis.title = element_text(size = 13, face = "bold", color = "#ffffff"),
-          panel.grid.major = element_line(color = "#2c3e50", linewidth = 0.5),
-          panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
-        )
+      # Create the plot using the helper function
+      create_weather_correlation_plot(
+        data = bigfoot_data_clean,
+        x_var = config$var,
+        title = config$title,
+        x_label = config$x_label,
+        slope_digits = config$slope_digits
+      )
       
     } else {
       # Return empty plot for other selections
+      par(bg = "#0a0e27")
       plot.new()
-      text(0.5, 0.5, "Select Precipitation or Visibility to see correlation", 
+      text(0.5, 0.5, "Select a Weather Variable to see correlation analysis", 
            cex = 1.2, col = "white")
     }
     
   }, bg = "#0a0e27")
-  
-  # Weather Correlation Statistics
-  output$correlation_stats <- renderPrint({
-    
-    # Read the data directly
-    bigfoot_data_clean <- read.csv("bigfoot_data_clean.csv")
-    
-    if (input$weather_layers == "precip") {
-      
-      # Generate precipitation summary
-      precip_summary <- bigfoot_data_clean %>%
-        group_by(precip_intensity) %>%
-        summarise(sightings = n())
-      
-      # Calculate linear regression model
-      lm_precip <- lm(sightings ~ precip_intensity, data = precip_summary)
-      model_summary <- summary(lm_precip)
-      
-      cat("Precipitation vs. Sightings\n\n")
-      cat("Slope:", format(model_summary$coefficients[2, 1], digits = 4), "\n")
-      cat("R-squared:", format(model_summary$r.squared, digits = 4), "\n")
-      cat("P-value:", format.pval(model_summary$coefficients[2, 4], digits = 3), "\n")
-      
-    } else if (input$weather_layers == "visibility") {
-      
-      # Generate visibility summary
-      vis_summary <- bigfoot_data_clean %>%
-        group_by(visibility) %>%
-        summarise(sightings = n())
-      
-      # Calculate linear regression model
-      lm_vis <- lm(sightings ~ visibility, data = vis_summary)
-      model_summary <- summary(lm_vis)
-      
-      cat("Visibility vs. Sightings\n\n")
-      cat("Slope:", format(model_summary$coefficients[2, 1], digits = 4), "\n")
-      cat("R-squared:", format(model_summary$r.squared, digits = 4), "\n")
-      cat("P-value:", format.pval(model_summary$coefficients[2, 4], digits = 3), "\n")
-      
-    } else {
-      cat("No correlation analysis selected\n")
-    }
-  })
   
   # Timeline plot showing all data
   output$timeline_plot <- renderPlot({
@@ -773,147 +641,6 @@ function(input, output, session) {
       </div>
     ")
   })
-  
-  
-  # Weather Correlation Scatter Plot
-  output$weather_correlation_scatter_plot <- renderPlot({
-    
-    # Read the data directly
-    bigfoot_data_clean <- read.csv("bigfoot_data_clean.csv", stringsAsFactors = FALSE)
-    
-    if (input$weather_layers == "precip") {
-      
-      # Generate precipitation summary
-      precip_summary <- bigfoot_data_clean %>%
-        group_by(precip_intensity) %>%
-        summarise(sightings = n(), .groups = "drop")
-      
-      # Calculate linear regression model
-      lm_precip <- lm(sightings ~ precip_intensity, data = precip_summary)
-      r_squared <- summary(lm_precip)$r.squared
-      p_value <- summary(lm_precip)$coefficients[2, 4]
-      slope <- coef(lm_precip)[2]
-      
-      # Create the plot
-      ggplot(precip_summary, aes(x = precip_intensity, y = sightings)) +
-        geom_point(size = 5, color = "#0047AB", alpha = 0.8) +
-        geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
-        labs(
-          title = "Precipitation Intensity vs Bigfoot Sightings",
-          subtitle = paste0(
-            "R² = ", round(r_squared, 3), 
-            " | Slope = ", round(slope, 2),
-            " | p-value = ", format.pval(p_value, digits = 3)
-          ),
-          x = "Precipitation Intensity", 
-          y = "Number of Sightings"
-        ) +
-        theme_minimal() +
-        theme(
-          plot.background = element_rect(fill = "#0a0e27", color = NA),
-          panel.background = element_rect(fill = "#1e2742", color = NA),
-          text = element_text(color = "#ffffff", size = 12),
-          plot.title = element_text(size = 16, face = "bold", color = "#ffffff"),
-          plot.subtitle = element_text(size = 14, color = "#f9ca24"),
-          axis.text = element_text(color = "#ffffff"),
-          axis.title = element_text(size = 13, face = "bold", color = "#ffffff"),
-          panel.grid.major = element_line(color = "#2c3e50", linewidth = 0.5),
-          panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
-        )
-      
-    } else if (input$weather_layers == "visibility") {
-      
-      # Generate visibility summary
-      vis_summary <- bigfoot_data_clean %>%
-        group_by(visibility) %>%
-        summarise(sightings = n(), .groups = "drop")
-      
-      # Calculate linear regression model
-      lm_vis <- lm(sightings ~ visibility, data = vis_summary)
-      r_squared <- summary(lm_vis)$r.squared
-      p_value <- summary(lm_vis)$coefficients[2, 4]
-      slope <- coef(lm_vis)[2]
-      
-      # Create the plot
-      ggplot(vis_summary, aes(x = visibility, y = sightings)) +
-        geom_point(size = 5, color = "#0047AB", alpha = 0.8) +
-        geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
-        labs(
-          title = "Visibility vs Bigfoot Sightings",
-          subtitle = paste0(
-            "R² = ", round(r_squared, 3), 
-            " | Slope = ", round(slope, 2),
-            " | p-value = ", format.pval(p_value, digits = 3)
-          ),
-          x = "Visibility (miles)", 
-          y = "Number of Sightings"
-        ) +
-        theme_minimal() +
-        theme(
-          plot.background = element_rect(fill = "#0a0e27", color = NA),
-          panel.background = element_rect(fill = "#1e2742", color = NA),
-          text = element_text(color = "#ffffff", size = 12),
-          plot.title = element_text(size = 16, face = "bold", color = "#ffffff"),
-          plot.subtitle = element_text(size = 14, color = "#f9ca24"),
-          axis.text = element_text(color = "#ffffff"),
-          axis.title = element_text(size = 13, face = "bold", color = "#ffffff"),
-          panel.grid.major = element_line(color = "#2c3e50", linewidth = 0.5),
-          panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
-        )
-      
-    } else {
-      # Return empty plot for other selections
-      par(bg = "#0a0e27")
-      plot.new()
-      text(0.5, 0.5, "Select Precipitation or Visibility layer to see correlation analysis", 
-           cex = 1.2, col = "white")
-    }
-    
-  }, bg = "#0a0e27")
-  
-  # Weather Correlation Model Statistics
-  output$weather_correlation_model_stats <- renderPrint({
-    
-    # Read the data directly
-    bigfoot_data_clean <- read.csv("bigfoot_data_clean.csv", stringsAsFactors = FALSE)
-    
-    if (input$weather_layers == "precip") {
-      
-      # Generate precipitation summary
-      precip_summary <- bigfoot_data_clean %>%
-        group_by(precip_intensity) %>%
-        summarise(sightings = n(), .groups = "drop")
-      
-      # Calculate linear regression model
-      lm_precip <- lm(sightings ~ precip_intensity, data = precip_summary)
-      model_summary <- summary(lm_precip)
-      
-      cat("Precipitation Intensity vs. Sightings\n\n")
-      cat("Slope:", format(model_summary$coefficients[2, 1], digits = 4), "\n")
-      cat("R-squared:", format(model_summary$r.squared, digits = 4), "\n")
-      cat("P-value:", format.pval(model_summary$coefficients[2, 4], digits = 3), "\n")
-      
-    } else if (input$weather_layers == "visibility") {
-      
-      # Generate visibility summary
-      vis_summary <- bigfoot_data_clean %>%
-        group_by(visibility) %>%
-        summarise(sightings = n(), .groups = "drop")
-      
-      # Calculate linear regression model
-      lm_vis <- lm(sightings ~ visibility, data = vis_summary)
-      model_summary <- summary(lm_vis)
-      
-      cat("Visibility vs. Sightings\n\n")
-      cat("Slope:", format(model_summary$coefficients[2, 1], digits = 4), "\n")
-      cat("R-squared:", format(model_summary$r.squared, digits = 4), "\n")
-      cat("P-value:", format.pval(model_summary$coefficients[2, 4], digits = 3), "\n")
-      
-    } else {
-      cat("Select Precipitation or Visibility layer to see correlation statistics\n")
-    }
-  })
-  
   
   # ============================================
   # MOON PHASE TRACKER
@@ -1252,5 +979,54 @@ function(input, output, session) {
     # Add grid
     grid(col = "gray80", lty = "dotted")
   })
+  # ============================================
+  # Correlation tab graphs
+  # ============================================
+  
+  
+  output$scatterPlot <- renderPlot({
+    if (input$modelChoice == "model1") {
+      create_model_plot(
+        data = merged_data,
+        x_var = "Forest.Coverage.Percent",
+        y_var = "Sightings",
+        model = model1,
+        title = "Bigfoot Sightings vs Forest Coverage by State",
+        x_label = "Forest Coverage (%)",
+        y_label = "Number of Bigfoot Sightings",
+        nudge_x = 0.5,
+        nudge_y = 2,
+        slope_digits = 2
+      )
+      
+    } else if (input$modelChoice == "model2") {
+      create_model_plot(
+        data = merged_data,
+        x_var = "Forest.Land.Area",
+        y_var = "Sightings",
+        model = model2,
+        title = "Bigfoot Sightings vs Forest Land Area by State",
+        x_label = "Forest Land Area (sq. miles)",
+        y_label = "Number of Bigfoot Sightings",
+        nudge_x = 1000,
+        nudge_y = 2,
+        slope_digits = 4
+      )
+      
+    } else if (input$modelChoice == "model3") {
+      create_model_plot(
+        data = merged_data,
+        x_var = "Census.Land.Area",
+        y_var = "Sightings",
+        model = model3,
+        title = "Bigfoot Sightings vs Census Land Area by State",
+        x_label = "Census Land Area (sq. miles)",
+        y_label = "Number of Bigfoot Sightings",
+        nudge_x = 2000,
+        nudge_y = 2,
+        slope_digits = 4
+      )
+    }
+  }, bg = "#0a0e27")
   
 }

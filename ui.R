@@ -341,8 +341,7 @@ navbarPage(
                       # Weather Correlation Plot Section
                       div(class = "box", style = "margin-top: 20px;",
                           h4("Weather Correlation Analysis", style = "color: #f9ca24;"),
-                          plotOutput("weather_correlation_scatter_plot", height = "400px"),
-                          verbatimTextOutput("weather_correlation_model_stats")
+                          plotOutput("weather_correlation_scatter_plot", height = "400px")
                       ),
                       
                       fluidRow(
@@ -366,27 +365,32 @@ navbarPage(
   
 #Sightings & Weather Correlations
 tabPanel("Correlations",
-           fluidPage(
-             style = "background-color: #0a0e27;",
+         fluidPage(
+           titlePanel("Bigfoot Sightings vs Various Metrics"),
+           style = "background-color: #0a0e27;",
+           
+           titlePanel(div(style = "color: #f9ca24; text-align: center;", "Various Other explanations of Bigfoot sightings")),
+           
+           sidebarLayout(
+             sidebarPanel(
+               selectInput("modelChoice", 
+                           "Select Model:",
+                           choices = c("Forest Coverage Percent" = "model1",
+                                       "Forest Land Area" = "model2",
+                                       "Census Land Area" = "model3"),
+                           selected = "model1")
+             ),
              
-             titlePanel(div(style = "color: #f9ca24; text-align: center;", "Correlations Between Bigfoot Sightings and Weather During Observation")),
-             
-             fluidRow(  
-               column(12,
-                      div(class = "box",
-                          h4("Weather Patterns & Bigfoot Sightings Correlations", style = "color: #f9ca4;"),
-                          div(style = "padding: 10px; margin-bottom: 15px; background-color: #1a1a1a; border-radius: 8px;",
-                              tags$p(style = "font-size: 14px; line-height: 1.6; margin: 5px 0;", 
-                                     "These correlation plots examine the relationship between various weather conditions and Bigfoot sighting frequencies. Each plot shows the linear regression analysis with R² values indicating the strength of the relationship.")
-                          ),
-                          plotOutput("weather_correlation_plots", height = "1100px")
-                      )
-               )
-             )  # close fluidRow            
+             mainPanel(
+               plotOutput("scatterPlot", height = "500px"),
+               verbatimTextOutput("modelStats")
+             )
            )
+         )
   ),
-  
-  # MOON PHASE TRACKER
+
+
+# MOON PHASE TRACKER
   tabPanel("Moon Phase Tracker",
            fluidPage(
              style = "background-color: #0a0e27;",
