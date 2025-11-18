@@ -701,6 +701,42 @@ function(input, output, session) {
     }
   })
   
+  # Timeline plot showing all data
+  output$timeline_plot <- renderPlot({
+    data <- bigfoot_sf() %>%
+      st_drop_geometry() %>%
+      filter(year <= input$year_slider)
+    
+    if(nrow(data) == 0) {
+      plot.new()
+      text(0.5, 0.5, "No data available", cex = 1.5, col = "white")
+      return()
+    }
+    
+    year_counts <- data %>%
+      group_by(year) %>%
+      summarise(count = n(), .groups = "drop")
+    
+    if(nrow(year_counts) == 0 || max(year_counts$count) == 0) {
+      plot.new()
+      text(0.5, 0.5, "No data to plot", cex = 1.5, col = "white")
+      return()
+    }
+    
+    par(bg = "#1a1a1a", col.axis = "white", col.lab = "white", col.main = "white")
+    plot(year_counts$year, year_counts$count,
+         type = "h",
+         col = ifelse(year_counts$year <= input$year_slider, "#ff6b6b", "#555555"),
+         lwd = 3,
+         xlab = "Year",
+         ylab = "Sightings",
+         main = "Sightings Timeline",
+         las = 1,
+         ylim = c(0, max(year_counts$count, na.rm = TRUE) * 1.1))
+    
+    abline(v = input$year_slider, col = "#4ecdc4", lwd = 2, lty = 2)
+    grid(col = "#333333", lty = 1)
+  })
   
   # Legend
   output$legend_info <- renderUI({
