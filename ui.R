@@ -17,10 +17,6 @@ ui <- fluidPage(
     "))
   ),
   
-  # ... rest of your UI code
-
-
-
 navbarPage(
   title = div(
     style = "display: flex; align-items: center;",
