@@ -1,4 +1,4 @@
-number_sightings_per_state <- bigfoot_data %>%
+number_sightings_per_state <- bigfoot_data_clean %>%
   count(state)
 
 number_sightings_per_state$state <- factor(number_sightings_per_state$state)
