@@ -4,7 +4,7 @@ bigfoot_data_for_words <- read.csv("bigfoot_data_wordcount_filtered_less_200.csv
 
 
 # for the elevation data, I deleted the front page that described the data. I edited the numbers so they had no commas or decimal points. I removed any of the non 50 U.S. states (U.S. territories) got the data from here: https://www.statista.com/statistics/1325529/lowest-points-united-states-state/
-# https://www.fs.usda.gov/sites/default/files/fs_media/fs_document/publication-15817-usda-forest-service-fia-annual-report-508.pdfgot got tree data from here. Deleted everything else that wasnt a state and only kept the first two columns to keep things organized
+# https://www.fs.usda.gov/sites/default/files/fs_media/fs_document/publication-15817-usda-forest-service-fia-annual-report-508.pdf got got tree data from here. Deleted everything else that wasnt a state and only kept the first two columns to keep things organized
 
 
 
@@ -981,7 +981,7 @@ function(input, output, session) {
     grid(col = "gray80", lty = "dotted")
   })
   # ============================================
-  # Correlation tab graphs
+  # Correlation tab graphs and text
   # ============================================
   
   
@@ -1029,5 +1029,25 @@ function(input, output, session) {
       )
     }
   }, bg = "#0a0e27")
+  
+  output$modelDescription <- renderUI({
+    switch(input$modelChoice,
+           "model1" = div(
+             style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
+             h4("Forest Coverage Percent"),
+             p("This model examines the relationship between the percentage of forest coverage in each state and Bigfoot sightings. States with higher percentage of their total land covered by forests may allow for more Bigfoot sightings as he is typically spotted in wooded areas. However, this correlation is almost non-existant providing evidence that the percent of land covered by forests in each state does not matter for Bigfoots wondering pattern.")
+           ),
+           "model2" = div(
+             style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
+             h4("Forest Land Area"),
+             p("This model looks at the total forest land area in thousand miles. Larger forested areas may correlate with more sightings due to greater wilderness exposure and exploration. This correlation is actually strong but this may be because larger states with more forests may be larger overall and thus have more people residing in them to make the observations.")
+           ),
+           "model3" = div(
+             style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
+             h4("Census Land Area"),
+             p("This model analyzes the total land area of each state with Bigfoot sightings. Larger states may have more sightings simply due to more available territory and population exposure to wilderness areas. This correlation is weak however providing more evidence that the best way to tell which states will have more Bigfoot sightings is by how much total land of forest there is in the state. ")
+           )
+    )
+  })
   
 }

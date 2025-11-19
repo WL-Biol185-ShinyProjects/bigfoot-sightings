@@ -364,7 +364,11 @@ navbarPage(
            )    # closes fluidPage  
   ),           # closes "Map of Sightings & Weather" tabPanel
   
+<<<<<<< HEAD
 #Weather Correlations
+=======
+#Correlation tab
+>>>>>>> b3ea2371c22d4b6f067a6c9d24b5d76e8ae96942
 tabPanel("Correlations",
          fluidPage(
            titlePanel("Bigfoot Sightings vs Various Metrics"),
@@ -383,8 +387,14 @@ tabPanel("Correlations",
              ),
              
              mainPanel(
+<<<<<<< HEAD
                plotOutput("scatterPlot", height = "1000px"),
                verbatimTextOutput("modelStats")
+=======
+               plotOutput("scatterPlot", height = "500px"),
+               verbatimTextOutput("modelStats"),
+               uiOutput("modelDescription")
+>>>>>>> b3ea2371c22d4b6f067a6c9d24b5d76e8ae96942
              )
            )
          )
