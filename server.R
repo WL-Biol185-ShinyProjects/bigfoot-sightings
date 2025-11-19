@@ -24,7 +24,6 @@ library(sf)
 library(lubridate)
 library(maps)
 library(gridExtra)
-library(ggrepel)
 
 # defines the server function in a Shiny application
 function(input, output, session) {
