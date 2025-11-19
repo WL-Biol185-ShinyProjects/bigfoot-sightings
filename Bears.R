@@ -4,11 +4,11 @@ library(sf)
 library(tigris)
 
 
-bigfoot_data <- read.csv("bigfoot_data.csv")
+bigfoot_data_clean <- read.csv("bigfoot_data_clean.csv")
 
 # Grouping Bigfoot sightings by State
 
-number_sightings_per_state <- bigfoot_data %>%
+number_sightings_per_state <- bigfoot_data_clean %>%
   count(state)
 
 # Grouping Bear Sightings by State
