@@ -394,7 +394,9 @@ tabPanel("Correlations",
                            "Select Model:",
                            choices = c("Forest Coverage Percent" = "model1",
                                        "Forest Land Area" = "model2",
-                                       "Census Land Area" = "model3"),
+                                       "Census Land Area" = "model3",
+                                       "Bear Sightings by State" = "model4",
+                                       "Bear Sightings by County" = "model5"),
                            selected = "model1")
              ),
              
@@ -404,8 +406,8 @@ tabPanel("Correlations",
                uiOutput("modelDescription")
              )
            )
-         )
-  ),
+         )  
+),
 
 
 # MOON PHASE TRACKER

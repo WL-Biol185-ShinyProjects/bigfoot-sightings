@@ -1026,6 +1026,67 @@ function(input, output, session) {
         nudge_y = 2,
         slope_digits = 4
       )
+      
+    } else if (input$modelChoice == "model4") {
+      # Bear sightings by state plot
+      ggplot(merged_bigfoot_bear_state, aes(x = bear_obs, y = bigfoot_obs, label = state)) +
+        geom_point(size = 5, color = "#0047AB", alpha = 0.8) +
+        geom_text_repel(size = 5, color = "#ffffff", 
+                        nudge_x = 50, nudge_y = 5,
+                        segment.color = "#ffffff", segment.alpha = 0.5) +
+        geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", 
+                    fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
+        labs(
+          title = "Bear vs. Bigfoot Sightings by State",
+          subtitle = paste0(
+            "R² = ", round(summary(bigfoot_bear_state_lm)$r.squared, 3), 
+            " | Slope = ", round(summary(bigfoot_bear_state_lm)$coefficients[2, 1], 2),
+            " | p-value = ", format.pval(summary(bigfoot_bear_state_lm)$coefficients[2, 4], digits = 3)
+          ),
+          x = "Bear Sightings",
+          y = "Bigfoot Sightings"
+        ) +
+        theme_minimal() +
+        theme(
+          plot.background = element_rect(fill = "#0a0e27", color = NA),
+          panel.background = element_rect(fill = "#1e2742", color = NA),
+          text = element_text(color = "#ffffff", size = 20),
+          plot.title = element_text(size = 16, face = "bold", color = "#ffffff"),
+          plot.subtitle = element_text(size = 14, color = "#f9ca24"),
+          axis.text = element_text(color = "#ffffff"),
+          axis.title = element_text(size = 13, face = "bold", color = "#ffffff"),
+          panel.grid.major = element_line(color = "#2c3e50", linewidth = 0.5),
+          panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
+        )
+      
+    } else if (input$modelChoice == "model5") {
+      # Bear sightings by county plot
+      ggplot(merged_bigfoot_bear_county, aes(x = bear_obs, y = bigfoot_obs)) +
+        geom_point(size = 5, color = "#0047AB", alpha = 0.8) +
+        geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", 
+                    fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
+        labs(
+          title = "Bear vs. Bigfoot Sightings by County, State",
+          subtitle = paste0(
+            "R² = ", round(summary(bigfoot_bear_county_lm)$r.squared, 3), 
+            " | Slope = ", round(summary(bigfoot_bear_county_lm)$coefficients[2, 1], 2),
+            " | p-value = ", format.pval(summary(bigfoot_bear_county_lm)$coefficients[2, 4], digits = 3)
+          ),
+          x = "Bear Sightings",
+          y = "Bigfoot Sightings"
+        ) +
+        theme_minimal() +
+        theme(
+          plot.background = element_rect(fill = "#0a0e27", color = NA),
+          panel.background = element_rect(fill = "#1e2742", color = NA),
+          text = element_text(color = "#ffffff", size = 20),
+          plot.title = element_text(size = 16, face = "bold", color = "#ffffff"),
+          plot.subtitle = element_text(size = 14, color = "#f9ca24"),
+          axis.text = element_text(color = "#ffffff"),
+          axis.title = element_text(size = 13, face = "bold", color = "#ffffff"),
+          panel.grid.major = element_line(color = "#2c3e50", linewidth = 0.5),
+          panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
+        )
     }
   }, bg = "#0a0e27")
   
@@ -1034,7 +1095,7 @@ function(input, output, session) {
            "model1" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
              h4("Forest Coverage Percent"),
-             p("This model examines the relationship between the percentage of forest coverage in each state and Bigfoot sightings. States with higher percentage of their total land covered by forests may allow for more Bigfoot sightings as he is typically spotted in wooded areas. However, this correlation is almost non-existant providing evidence that the percent of land covered by forests in each state does not matter for Bigfoots wondering pattern.")
+             p("This model examines the relationship between the percentage of forest coverage in each state and Bigfoot sightings. States with higher percentage of their total land covered by forests may allow for more Bigfoot sightings as he is typically spotted in wooded areas. However, this correlation is almost non-existent providing evidence that the percent of land covered by forests in each state does not matter for Bigfoots wandering pattern.")
            ),
            "model2" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
@@ -1044,7 +1105,17 @@ function(input, output, session) {
            "model3" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
              h4("Census Land Area"),
-             p("This model analyzes the total land area of each state with Bigfoot sightings. Larger states may have more sightings simply due to more available territory and population exposure to wilderness areas. This correlation is weak however providing more evidence that the best way to tell which states will have more Bigfoot sightings is by how much total land of forest there is in the state. ")
+             p("This model analyzes the total land area of each state with Bigfoot sightings. Larger states may have more sightings simply due to more available territory and population exposure to wilderness areas. This correlation is weak however providing more evidence that the best way to tell which states will have more Bigfoot sightings is by how much total land of forest there is in the state.")
+           ),
+           "model4" = div(
+             style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
+             h4("Bear Sightings by State"),
+             p("This model explores whether bear sightings at the state level correlate with Bigfoot sightings. The hypothesis is that if people are mistaking bears for Bigfoot, we would see a strong positive correlation between the two. Alternatively, both bears and Bigfoot may simply prefer similar habitats (forested wilderness areas), which could also explain a correlation.")
+           ),
+           "model5" = div(
+             style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
+             h4("Bear Sightings by County"),
+             p("This model examines the relationship between bear and Bigfoot sightings at a more granular county level. A county-level analysis provides more data points and controls for within-state variation, potentially revealing whether the bear-Bigfoot correlation holds when examining smaller geographic areas where habitat conditions are more uniform.")
            )
     )
   })

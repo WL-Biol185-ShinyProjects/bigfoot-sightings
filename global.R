@@ -44,6 +44,65 @@ print(summary(model2))
 print("\nModel 3: Sightings ~ Census Land Area")
 print(summary(model3))
 
+
+# Bear data processing (from your generator code)
+bear_sightings <- read.csv("BearSightingsdata.csv") %>%
+  rename(
+    lat = decimalLatitude,
+    lon = decimalLongitude
+  )
+
+# State-level bear analysis
+bear_state <- bear_sightings %>%
+  count(stateProvince) %>%
+  rename(state = stateProvince)
+
+merged_bigfoot_bear_state <- merge(bear_state, number_sightings_per_state, by = "state") %>%
+  rename(
+    bear_obs = n.x,
+    bigfoot_obs = n.y
+  )
+
+bigfoot_bear_state_lm <- lm(bear_obs ~ bigfoot_obs, data = merged_bigfoot_bear_state)
+
+# County-level bear analysis (requires counties data from tigris)
+counties <- counties(cb = TRUE, resolution = "20m", year = 2022)
+counties <- counties %>%
+  select(STATEFP, COUNTYFP, NAME, NAMELSAD, STUSPS) %>%
+  st_transform(4326)
+
+bear_sightings_sf <- st_as_sf(
+  bear_sightings,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+
+bear_sightings_with_county <- st_join(bear_sightings_sf, counties, join = st_within) %>%
+  st_drop_geometry()
+
+bear_state_county <- bear_sightings_with_county %>%
+  group_by(stateProvince, NAMELSAD) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  arrange(stateProvince, desc(count)) %>%
+  rename(state = stateProvince, county = NAMELSAD) %>%
+  mutate(county_state = paste(county, state, sep = ", ")) %>%
+  select(-county, -state)
+
+bigfoot_state_county <- bigfoot_data_clean %>%
+  group_by(state, county) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  arrange(state, desc(count)) %>%
+  mutate(county_state = paste(county, state, sep = ", ")) %>%
+  select(-county, -state)
+
+merged_bigfoot_bear_county <- merge(bear_state_county, bigfoot_state_county, by = "county_state") %>%
+  rename(
+    bear_obs = count.x,
+    bigfoot_obs = count.y
+  )
+
+bigfoot_bear_county_lm <- lm(bear_obs ~ bigfoot_obs, data = merged_bigfoot_bear_county)
+
 # ============================================
 # For Loading data for correlation graphs on topo graphic map tab
 # ============================================
