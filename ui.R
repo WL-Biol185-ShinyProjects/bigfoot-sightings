@@ -6,6 +6,19 @@ library(sf)
 library(dplyr)
 library(lubridate)
 
+# making all dropdowns black
+ui <- fluidPage(
+  tags$head(
+    tags$style(HTML("
+      select, option, .selectize-input, .selectize-dropdown, .selectize-dropdown-content {
+        color: #000000 !important;
+        background-color: #FFFFFF !important;
+      }
+    "))
+  ),
+  
+  # ... rest of your UI code
+
 
 
 navbarPage(
@@ -526,4 +539,5 @@ tabPanel("Topographic Map",
              )
            )
   )
+)
 )
