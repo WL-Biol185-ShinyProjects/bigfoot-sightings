@@ -1,3 +1,5 @@
+library(ggrepel)
+
 # Function to create formatted scatter plots with regression lines
 create_model_plot <- function(data, x_var, y_var, model, title, x_label, y_label, 
                               nudge_x = 0, nudge_y = 2, slope_digits = 2) {
@@ -11,8 +13,9 @@ create_model_plot <- function(data, x_var, y_var, model, title, x_label, y_label
   # Create the plot
   ggplot(data, aes(x = .data[[x_var]], y = .data[[y_var]], label = State)) +
     geom_point(size = 5, color = "#0047AB", alpha = 0.8) +
-    geom_text(hjust = 0, vjust = 0, size = 3, 
-              nudge_x = nudge_x, nudge_y = nudge_y, color = "#ffffff") +
+    geom_text_repel(size = 5, color = "#ffffff", 
+                    nudge_x = nudge_x, nudge_y = nudge_y,
+                    segment.color = "#ffffff", segment.alpha = 0.5) +
     geom_smooth(method = "lm", se = TRUE, color = "#f9ca24", 
                 fill = "#f9ca24", alpha = 0.2, linewidth = 1.5) +
     labs(
@@ -29,7 +32,7 @@ create_model_plot <- function(data, x_var, y_var, model, title, x_label, y_label
     theme(
       plot.background = element_rect(fill = "#0a0e27", color = NA),
       panel.background = element_rect(fill = "#1e2742", color = NA),
-      text = element_text(color = "#ffffff", size = 12),
+      text = element_text(color = "#ffffff", size = 20),
       plot.title = element_text(size = 16, face = "bold", color = "#ffffff"),
       plot.subtitle = element_text(size = 14, color = "#f9ca24"),
       axis.text = element_text(color = "#ffffff"),
@@ -38,3 +41,4 @@ create_model_plot <- function(data, x_var, y_var, model, title, x_label, y_label
       panel.grid.minor = element_line(color = "#2c3e50", linewidth = 0.25)
     )
 }
+
