@@ -342,7 +342,7 @@ navbarPage(
                       # Weather Correlation Plot Section
                       div(class = "box", style = "margin-top: 20px;",
                           h4("Weather Correlation Analysis", style = "color: #f9ca24;"),
-                          plotOutput("weather_correlation_scatter_plot", height = "400px")
+                          plotOutput("weather_correlation_scatter_plot", height = "700px")
                       ),
                       
                       fluidRow(
