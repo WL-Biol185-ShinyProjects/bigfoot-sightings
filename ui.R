@@ -388,8 +388,6 @@ tabPanel("Correlations",
              mainPanel(
                plotOutput("scatterPlot", height = "1000px"),
                verbatimTextOutput("modelStats"),
-               plotOutput("scatterPlot", height = "500px"),
-               verbatimTextOutput("modelStats"),
                uiOutput("modelDescription")
              )
            )
