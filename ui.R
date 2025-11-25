@@ -282,6 +282,9 @@ navbarPage(
              
              fluidRow(
                # Left sidebar with controls
+               # In your Map tab, find the left sidebar column(3, ...) section
+               # Replace the current controls with this:
+               
                column(3,
                       div(style = "background-color: #2c3e50; border-radius: 12px; padding: 20px; position: sticky; top: 20px;",
                           h4("Bigfoot Sightings", style = "color: #ff6b6b;"),
@@ -306,10 +309,19 @@ navbarPage(
                                         min = 2, max = 15, value = 5, step = 1)
                           ),
                           
-                          sliderInput("year_slider", "Year (Cumulative):",
+                          # NEW: Radio buttons for view type
+                          radioButtons("view_type", "Time View:",
+                                       choices = c("Cumulative (All years up to selected)" = "cumulative",
+                                                   "Single Year Only" = "single"),
+                                       selected = "cumulative"),
+                          
+                          sliderInput("year_slider", "Year:",
                                       min = 1900, max = 2024, value = 1900, 
                                       step = 1, sep = "",
                                       animate = animationOptions(interval = 300, loop = FALSE)),
+                          
+                          # Shows what data is being displayed
+                          textOutput("year_description"),
                           
                           h4("Weather Layers", style = "color: #4ecdc4; margin-top: 20px;"),
                           

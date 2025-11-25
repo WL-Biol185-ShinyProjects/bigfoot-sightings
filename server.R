@@ -109,6 +109,11 @@ function(input, output, session) {
   # SIGHTINGS AND WEATHER MAP
   # ============================================
   
+  # ============================================
+  # COMPLETE MAP SECTION FOR SERVER
+  # Replace everything from "# Load Bigfoot sightings data" to the end of the map observe() block
+  # ============================================
+  
   # Load Bigfoot sightings data
   bigfoot_observations <- reactive({
     read.csv("bigfoot_data_clean.csv", stringsAsFactors = FALSE)
@@ -202,30 +207,31 @@ function(input, output, session) {
                         min = min_year,
                         max = max_year,
                         value = min_year)
-      }
-      
-      # Update state filter choices
-      states <- sort(unique(data$state[!is.na(data$state)]))
-      
-      updateSelectInput(session, "map_state",
-                        choices = c("All States", states),
-                        selected = "All States")
-      
-      updateSelectInput(session, "state_filter",
-                        choices = states,
-                        selected = NULL)
-  
+    }
+    
+    # Update state filter choices
+    states <- sort(unique(data$state[!is.na(data$state)]))
+    
+    updateSelectInput(session, "map_state",
+                      choices = c("All States", states),
+                      selected = "All States")
+    
+    updateSelectInput(session, "state_filter",
+                      choices = states,
+                      selected = NULL)
   })
   
   # Filter Bigfoot data based on inputs
   filtered_sf <- reactive({
     data <- bigfoot_sf()
     
-    # Filter by year based on view mode
-    if (input$view_mode == "cumulative") {
+    # Filter by year based on view type
+    if (input$view_type == "cumulative") {
+      # Cumulative: show all sightings from earliest year UP TO selected year
       data <- data %>%
         filter(year <= input$year_slider)
     } else {
+      # Single year: show ONLY sightings from selected year
       data <- data %>%
         filter(year == input$year_slider)
     }
@@ -238,14 +244,18 @@ function(input, output, session) {
     return(data)
   })
   
-  # Filter weather data based on date range and selected state
   # Filter weather data based on year filters and selected state
   filtered_weather <- reactive({
     df <- weather_data()
     
-    # Filter by year range (cumulative up to selected year) - matching the bigfoot data filter
-    df <- df %>%
-      filter(!is.na(year) & year <= input$year_slider)
+    # Filter by year based on view type
+    if (input$view_type == "cumulative") {
+      df <- df %>%
+        filter(!is.na(year) & year <= input$year_slider)
+    } else {
+      df <- df %>%
+        filter(!is.na(year) & year == input$year_slider)
+    }
     
     # Filter by selected state if not "All States"
     if(!is.null(input$map_state) && input$map_state != "All States") {
@@ -267,7 +277,7 @@ function(input, output, session) {
       ) %>%
       filter(!is.na(lat) & !is.na(long))
   })
- 
+  
   # Load state boundaries
   state_boundaries <- reactive({
     if(input$show_state_boundaries) {
@@ -368,7 +378,7 @@ function(input, output, session) {
           stroke = TRUE,
           weight = 1,
           layerId = ~marker_id,
-        
+          
           clusterOptions = markerClusterOptions(
             showCoverageOnHover = FALSE,
             zoomToBoundsOnClick = TRUE
@@ -410,22 +420,6 @@ function(input, output, session) {
         )
     }
     
-    #adding year back in 
-    # Sighting count output
-    output$sighting_count <- renderText({
-      data <- filtered_sf()
-      paste("Total Sightings:", format(nrow(data), big.mark = ","))
-    })
-    
-    # Year info output
-    output$year_info <- renderText({
-      data <- filtered_sf()
-      if(nrow(data) > 0) {
-        paste("Showing data up to:", input$year_slider)
-      } else {
-        "No data available"
-      }
-    })
     # Add Weather layers
     if(nrow(weather_df) > 0) {
       
@@ -540,6 +534,37 @@ function(input, output, session) {
     }
     
     map
+  })
+  
+  # Sighting count output
+  output$sighting_count <- renderText({
+    data <- filtered_sf()
+    paste("Total Sightings:", format(nrow(data), big.mark = ","))
+  })
+  
+  # Year info output
+  output$year_info <- renderText({
+    data <- filtered_sf()
+    if(nrow(data) > 0) {
+      if(input$view_type == "cumulative") {
+        paste("Cumulative data through:", input$year_slider)
+      } else {
+        paste("Year:", input$year_slider)
+      }
+    } else {
+      "No data available"
+    }
+  })
+  
+  # Year description output (optional - shows in the sidebar)
+  output$year_description <- renderText({
+    data <- filtered_sf()
+    if(input$view_type == "cumulative") {
+      paste("Showing all sightings from", min(bigfoot_sf()$year, na.rm = TRUE), 
+            "to", input$year_slider)
+    } else {
+      paste("Showing sightings from", input$year_slider, "only")
+    }
   })
   
   
