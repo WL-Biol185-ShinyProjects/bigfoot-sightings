@@ -109,25 +109,21 @@ function(input, output, session) {
   # SIGHTINGS AND WEATHER MAP
   # ============================================
   
-  # ============================================
-  # COMPLETE MAP SECTION FOR SERVER
-  # Replace everything from "# Load Bigfoot sightings data" to the end of the map observe() block
-  # ============================================
-  
   # Load Bigfoot sightings data
   bigfoot_observations <- reactive({
-    read.csv("bigfoot_data_clean.csv", stringsAsFactors = FALSE)
+    tryCatch({
+      read.csv("bigfoot_data_clean.csv", stringsAsFactors = FALSE)
+    }, error = function(e) {
+      showNotification("Error loading bigfoot data", type = "error")
+      return(data.frame())
+    })
   })
   
   # Convert to Simple Features (SF) object with cleaned data
   bigfoot_sf <- reactive({
     df <- bigfoot_observations()
     
-    # DEBUGGING: Print column names to see what you have
-    print("Column names in CSV:")
-    print(colnames(df))
-    
-    print(paste("Total rows loaded:", nrow(df)))
+    if(nrow(df) == 0) return(NULL)
     
     # Rename columns to standard names
     if("latitude" %in% colnames(df)) {
@@ -146,7 +142,7 @@ function(input, output, session) {
     # Remove empty date strings
     df$date[df$date == ""] <- NA
     
-    # Parse date - your format is m/d/Y (e.g., "12/3/2005")
+    # Parse date
     df$date_parsed <- as.Date(df$date, format = "%m/%d/%Y")
     
     # Try alternate format if first attempt fails
@@ -154,43 +150,30 @@ function(input, output, session) {
       df$date_parsed <- as.Date(df$date, format = "%Y-%m-%d")
     }
     
-    print(paste("Dates parsed successfully:", sum(!is.na(df$date_parsed))))
-    
     df$year <- year(df$date_parsed)
-    
-    print(paste("Years extracted:", sum(!is.na(df$year))))
     
     # Remove rows with missing coordinates or dates
     df_clean <- df %>%
-      filter(!is.na(lat) & !is.na(long) & !is.na(year))
-    
-    print(paste("Rows after removing NAs:", nrow(df_clean)))
-    
-    # Filter reasonable coordinate ranges
-    df_clean <- df_clean %>%
+      filter(!is.na(lat) & !is.na(long) & !is.na(year)) %>%
       filter(lat >= -90 & lat <= 90) %>%
       filter(long >= -180 & long <= 180)
     
-    print(paste("Final rows after coordinate filter:", nrow(df_clean)))
-    
-    # Check if we have any data left
     if(nrow(df_clean) == 0) {
-      stop("No valid data after filtering. Check your date format and coordinates.")
+      return(NULL)
     }
     
     # Convert to SF object
     sf_obj <- st_as_sf(df_clean, 
                        coords = c("long", "lat"),
-                       crs = 4326,  # WGS84 coordinate system
+                       crs = 4326,
                        remove = FALSE)
-    
-    print(paste("SF object created with", nrow(sf_obj), "rows"))
     
     return(sf_obj)
   })
   
   # Load weather data
   weather_data <- reactive({
+    req(bigfoot_sf())
     df <- bigfoot_sf() %>% st_drop_geometry()
     return(df)
   })
@@ -198,6 +181,7 @@ function(input, output, session) {
   # Update slider ranges based on actual data
   observe({
     data <- bigfoot_sf()
+    req(data)
     
     if(nrow(data) > 0) {
       min_year <- min(data$year, na.rm = TRUE)
@@ -223,17 +207,15 @@ function(input, output, session) {
   
   # Filter Bigfoot data based on inputs
   filtered_sf <- reactive({
+    req(input$view_type, input$year_slider)
     data <- bigfoot_sf()
+    req(data)
     
     # Filter by year based on view type
     if (input$view_type == "cumulative") {
-      # Cumulative: show all sightings from earliest year UP TO selected year
-      data <- data %>%
-        filter(year <= input$year_slider)
+      data <- data %>% filter(year <= input$year_slider)
     } else {
-      # Single year: show ONLY sightings from selected year
-      data <- data %>%
-        filter(year == input$year_slider)
+      data <- data %>% filter(year == input$year_slider)
     }
     
     # Filter by selected state if not "All States"
@@ -246,20 +228,24 @@ function(input, output, session) {
   
   # Filter weather data based on year filters and selected state
   filtered_weather <- reactive({
+    req(input$view_type, input$year_slider)
     df <- weather_data()
     
     # Filter by year based on view type
     if (input$view_type == "cumulative") {
-      df <- df %>%
-        filter(!is.na(year) & year <= input$year_slider)
+      df <- df %>% filter(!is.na(year) & year <= input$year_slider)
     } else {
-      df <- df %>%
-        filter(!is.na(year) & year == input$year_slider)
+      df <- df %>% filter(!is.na(year) & year == input$year_slider)
     }
     
     # Filter by selected state if not "All States"
     if(!is.null(input$map_state) && input$map_state != "All States") {
       df <- df %>% filter(state == input$map_state)
+    }
+    
+    # LIMIT ROWS BEFORE AGGREGATION to prevent memory issues
+    if(nrow(df) > 50000) {
+      df <- df %>% sample_n(50000)
     }
     
     # Group by location and aggregate weather data
@@ -327,6 +313,8 @@ function(input, output, session) {
     bigfoot_data_clean <- filtered_sf()
     weather_df <- filtered_weather()
     
+    req(bigfoot_data_clean)
+    
     # Clear existing layers
     map <- leafletProxy("map") %>%
       clearHeatmap() %>%
@@ -348,10 +336,20 @@ function(input, output, session) {
     }
     
     # Add Bigfoot visualization based on mode
-    if(input$view_mode == "heat" && nrow(bigfoot_data_clean) > 0) {
+    if(input$view_mode == "none") {
+      # Do nothing - no sightings layer shown
+      
+    } else if(input$view_mode == "heat" && nrow(bigfoot_data_clean) > 0) {
+      
+      # LIMIT HEATMAP POINTS
+      heat_data <- bigfoot_data_clean
+      if(nrow(heat_data) > 10000) {
+        heat_data <- heat_data %>% sample_n(10000)
+      }
+      
       map <- map %>%
         addHeatmap(
-          data = bigfoot_data_clean,
+          data = heat_data,
           lng = ~long,
           lat = ~lat,
           intensity = 2,
@@ -361,6 +359,7 @@ function(input, output, session) {
           minOpacity = 0.3,
           group = "Bigfoot Sightings"
         )
+      
     } else if(input$view_mode == "cluster" && nrow(bigfoot_data_clean) > 0) {
       
       # Merge observation data - clustered
@@ -372,13 +371,12 @@ function(input, output, session) {
           data = data_with_obs,
           lng = ~long,
           lat = ~lat,
-          radius=4,
+          radius = 4,
           color = "#ff6b6b",
           fillOpacity = 0.6,
           stroke = TRUE,
           weight = 1,
           layerId = ~marker_id,
-          
           clusterOptions = markerClusterOptions(
             showCoverageOnHover = FALSE,
             zoomToBoundsOnClick = TRUE
@@ -391,10 +389,16 @@ function(input, output, session) {
           ),
           group = "Bigfoot Sightings"
         )
+      
     } else if(input$view_mode == "circles" && nrow(bigfoot_data_clean) > 0) {
       
-      # Merge observation data - circles
-      data_with_obs <- bigfoot_data_clean %>%
+      # LIMIT CIRCLE MARKERS
+      data_with_obs <- bigfoot_data_clean
+      if(nrow(data_with_obs) > 5000) {
+        data_with_obs <- data_with_obs %>% sample_n(5000)
+      }
+      
+      data_with_obs <- data_with_obs %>%
         mutate(marker_id = paste0("marker_", seq_len(n())))
       
       map <- map %>%
@@ -483,32 +487,50 @@ function(input, output, session) {
           )
       }
       
-      # Add Wind arrows
+      # Add Wind arrows - RESTRICTED TO SELECTED STATES ONLY
       if("wind" %in% input$weather_layers) {
-        # Filter by selected states if any are chosen
-        wind_df <- weather_df
-        if(!is.null(input$state_filter) && length(input$state_filter) > 0) {
-          wind_df <- weather_df %>% filter(state %in% input$state_filter)
-        } else {
-          wind_df <- weather_df %>% filter(FALSE)
-        }
         
-        for(i in 1:nrow(wind_df)) {
-          map <- map %>%
-            addMarkers(
-              lng = wind_df$long[i],
-              lat = wind_df$lat[i],
-              icon = makeIcon(
-                iconUrl = sprintf("data:image/svg+xml,%%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%%3E%%3Cg transform='rotate(%f 20 20)'%%3E%%3Cpolygon points='20,5 28,18 23,18 23,30 17,30 17,18 12,18' fill='%%23FF4444' stroke='%%23CC0000' stroke-width='1.5'%%3E%%3C/polygon%%3E%%3C/g%%3E%%3C/svg%%3E", 
-                                  wind_df$wind_bearing_avg[i]),
-                iconWidth = 40, iconHeight = 40
-              ),
-              popup = paste0("<b>", wind_df$county[i], ", ", wind_df$state[i], "</b><br>",
-                             "Wind Speed: ", round(wind_df$wind_speed_avg[i], 1), " mph<br>",
-                             "Direction: ", round(wind_df$wind_bearing_avg[i], 0), "°<br>",
-                             "Observations: ", wind_df$n_observations[i]),
-              group = "Wind"
-            )
+        wind_df <- weather_df
+        
+        # Check if user has selected states in state_filter
+        if(!is.null(input$state_filter) && length(input$state_filter) > 0) {
+          
+          # Filter to selected states only
+          wind_df <- weather_df %>% filter(state %in% input$state_filter)
+          
+          # CRITICAL: Limit to 100 arrows TOTAL across all selected states
+          if(nrow(wind_df) > 100) {
+            wind_df <- wind_df %>% sample_n(100)
+          }
+          
+          # Only proceed if we have data
+          if(nrow(wind_df) > 0) {
+            for(i in 1:nrow(wind_df)) {
+              map <- map %>%
+                addMarkers(
+                  lng = wind_df$long[i],
+                  lat = wind_df$lat[i],
+                  icon = makeIcon(
+                    iconUrl = sprintf("data:image/svg+xml,%%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%%3E%%3Cg transform='rotate(%f 20 20)'%%3E%%3Cpolygon points='20,5 28,18 23,18 23,30 17,30 17,18 12,18' fill='%%23FF4444' stroke='%%23CC0000' stroke-width='1.5'%%3E%%3C/polygon%%3E%%3C/g%%3E%%3C/svg%%3E", 
+                                      wind_df$wind_bearing_avg[i]),
+                    iconWidth = 40, iconHeight = 40
+                  ),
+                  popup = paste0("<b>", wind_df$county[i], ", ", wind_df$state[i], "</b><br>",
+                                 "Wind Speed: ", round(wind_df$wind_speed_avg[i], 1), " mph<br>",
+                                 "Direction: ", round(wind_df$wind_bearing_avg[i], 0), "°<br>",
+                                 "Observations: ", wind_df$n_observations[i]),
+                  group = "Wind"
+                )
+            }
+          }
+          
+        } else {
+          # No states selected - show notification
+          showNotification(
+            "Please select one or more states in the 'Wind: Select States' dropdown to view wind arrows",
+            type = "warning",
+            duration = 4
+          )
         }
       }
       
@@ -539,12 +561,14 @@ function(input, output, session) {
   # Sighting count output
   output$sighting_count <- renderText({
     data <- filtered_sf()
+    req(data)
     paste("Total Sightings:", format(nrow(data), big.mark = ","))
   })
   
   # Year info output
   output$year_info <- renderText({
     data <- filtered_sf()
+    req(data)
     if(nrow(data) > 0) {
       if(input$view_type == "cumulative") {
         paste("Cumulative data through:", input$year_slider)
@@ -556,8 +580,9 @@ function(input, output, session) {
     }
   })
   
-  # Year description output (optional - shows in the sidebar)
+  # Year description output
   output$year_description <- renderText({
+    req(bigfoot_sf())
     data <- filtered_sf()
     if(input$view_type == "cumulative") {
       paste("Showing all sightings from", min(bigfoot_sf()$year, na.rm = TRUE), 

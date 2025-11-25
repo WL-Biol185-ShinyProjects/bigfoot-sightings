@@ -290,7 +290,8 @@ navbarPage(
                           h4("Bigfoot Sightings", style = "color: #ff6b6b;"),
                           
                           selectInput("view_mode", "Visualization Mode:",
-                                      choices = c("Heatmap" = "heat",
+                                      choices = c("None (Hide Sightings)" = "none",
+                                                  "Heatmap" = "heat",
                                                   "Clustered Markers" = "cluster", 
                                                   "Circle Markers" = "circles"),
                                       selected = "heat"),
@@ -339,7 +340,12 @@ navbarPage(
                             selectInput("state_filter", "Wind: Select States",
                                         choices = NULL,
                                         multiple = TRUE,
-                                        selectize = TRUE)
+                                        selectize = TRUE),
+                            div(style = "padding: 10px; background-color: #1a1a1a; border-radius: 8px; margin-top: 10px;",
+                                tags$p(style = "color: #f9ca24; font-size: 12px; margin: 0;",
+                                       icon("info-circle"),
+                                       " Select specific states to view wind arrows. Limited to 100 arrows total for performance.")
+                            )
                           ),
                           
                           h4("Map Options", style = "margin-top: 20px;"),
