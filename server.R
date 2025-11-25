@@ -984,6 +984,230 @@ function(input, output, session) {
     # Add grid
     grid(col = "gray80", lty = "dotted")
   })
+  
+  # Add this code to your server function (inside the main server function)
+  
+  # ============================================
+  # BIGFOOT PROBABILITY PREDICTOR
+  # ============================================
+  
+  # Update state choices for predictor
+  observe({
+    data <- bigfoot_sf()
+    states <- sort(unique(data$state[!is.na(data$state)]))
+    
+    updateSelectInput(session, "pred_state",
+                      choices = states,
+                      selected = states[1])
+  })
+  
+  # Calculate probability when button is clicked
+  probability_result <- eventReactive(input$calculate_prob, {
+    
+    # Load data
+    data <- bigfoot_sf() %>% st_drop_geometry()
+    
+    # Get total sightings
+    total_sightings <- nrow(data)
+    
+    # Calculate probabilities for each factor
+    
+    # 1. State probability (sightings in state / total sightings)
+    state_sightings <- data %>% 
+      filter(state == input$pred_state) %>% 
+      nrow()
+    state_prob <- state_sightings / total_sightings
+    
+    # 2. Season probability
+    season_sightings <- data %>%
+      filter(season == input$pred_season) %>%
+      nrow()
+    season_prob <- season_sightings / total_sightings
+    
+    # 3. Temperature probability (within ±10 degrees)
+    temp_sightings <- data %>%
+      filter(abs(temperature_high - input$pred_temp) <= 10) %>%
+      nrow()
+    temp_prob <- temp_sightings / total_sightings
+    
+    # 4. Moon phase probability (within ±0.1)
+    moon_data <- read.csv("filtered_data_date_moon_phase.csv")
+    moon_sightings <- moon_data %>%
+      filter(abs(moon_phase - input$pred_moon) <= 0.1) %>%
+      nrow()
+    moon_prob <- moon_sightings / nrow(moon_data)
+    
+    # 5. Visibility probability (higher visibility = lower probability based on our data)
+    vis_sightings <- data %>%
+      filter(abs(visibility - input$pred_visibility) <= 2) %>%
+      nrow()
+    vis_prob <- vis_sightings / total_sightings
+    
+    # Combined probability (average of all factors, weighted)
+    # Weight state and season more heavily
+    combined_prob <- (state_prob * 0.35 + 
+                        season_prob * 0.25 + 
+                        temp_prob * 0.15 + 
+                        moon_prob * 0.15 + 
+                        vis_prob * 0.10) * 100
+    
+    # Create result list
+    list(
+      total_prob = combined_prob,
+      state_prob = state_prob * 100,
+      season_prob = season_prob * 100,
+      temp_prob = temp_prob * 100,
+      moon_prob = moon_prob * 100,
+      vis_prob = vis_prob * 100,
+      state_sightings = state_sightings,
+      season_sightings = season_sightings
+    )
+  })
+  
+  # Display probability
+  output$probability_display <- renderUI({
+    req(input$calculate_prob)
+    result <- probability_result()
+    
+    prob_value <- round(result$total_prob, 2)
+    
+    # Color based on probability
+    color <- if(prob_value < 2) {
+      "#ff6b6b"  # Low - red
+    } else if(prob_value < 5) {
+      "#f9ca24"  # Medium - yellow
+    } else {
+      "#4ecdc4"  # High - cyan
+    }
+    
+    div(
+      tags$h1(style = paste0("color: ", color, "; font-size: 72px; font-weight: bold; margin: 20px 0;"),
+              paste0(prob_value, "%")),
+      tags$p(style = "font-size: 20px; color: #e4e4e4;",
+             if(prob_value < 2) {
+               "Low Chance - But keep your eyes open!"
+             } else if(prob_value < 5) {
+               "Moderate Chance - Stay alert!"
+             } else {
+               "High Chance - Bigfoot territory!"
+             })
+    )
+  })
+  
+  # Probability gauge visualization
+  output$probability_gauge <- renderPlot({
+    req(input$calculate_prob)
+    result <- probability_result()
+    
+    prob <- result$total_prob
+    
+    # Create gauge chart
+    par(bg = "#1a1a1a", mar = c(0, 0, 0, 0))
+    
+    # Draw arc
+    theta <- seq(pi, 0, length.out = 100)
+    x <- cos(theta)
+    y <- sin(theta)
+    
+    plot(x, y, type = "n", xlim = c(-1.2, 1.2), ylim = c(-0.2, 1.2),
+         axes = FALSE, xlab = "", ylab = "", asp = 1)
+    
+    # Background arc
+    lines(x, y, lwd = 20, col = "#2c3e50")
+    
+    # Filled arc based on probability
+    prob_theta <- seq(pi, pi - (prob/100) * pi, length.out = 100)
+    prob_x <- cos(prob_theta)
+    prob_y <- sin(prob_theta)
+    
+    # Color gradient
+    gauge_color <- if(prob < 2) "#ff6b6b" else if(prob < 5) "#f9ca24" else "#4ecdc4"
+    lines(prob_x, prob_y, lwd = 20, col = gauge_color)
+    
+    # Add labels
+    text(0, -0.1, "Your Probability Meter", col = "white", cex = 1.2)
+    text(-1, 0, "0%", col = "white", cex = 1)
+    text(1, 0, "10%", col = "white", cex = 1)
+    
+  }, bg = "#1a1a1a")
+  
+  # Factor breakdown
+  output$factor_breakdown <- renderUI({
+    req(input$calculate_prob)
+    result <- probability_result()
+    
+    tagList(
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "State (", input$pred_state, "): "),
+          tags$span(style = "color: #e4e4e4;", 
+                    paste0(round(result$state_prob, 2), "% - ", 
+                           result$state_sightings, " historical sightings"))
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Season (", input$pred_season, "): "),
+          tags$span(style = "color: #e4e4e4;", 
+                    paste0(round(result$season_prob, 2), "% - ", 
+                           result$season_sightings, " historical sightings"))
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Temperature: "),
+          tags$span(style = "color: #e4e4e4;", 
+                    paste0(round(result$temp_prob, 2), "% match"))
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Moon Phase: "),
+          tags$span(style = "color: #e4e4e4;", 
+                    paste0(round(result$moon_prob, 2), "% - ", 
+                           get_phase_name(input$pred_moon)))
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Visibility: "),
+          tags$span(style = "color: #e4e4e4;", 
+                    paste0(round(result$vis_prob, 2), "% match"))
+      )
+    )
+  })
+  
+  # Recommendations
+  output$recommendations <- renderUI({
+    req(input$calculate_prob)
+    result <- probability_result()
+    
+    recommendations <- list()
+    
+    # Check each factor and give recommendations
+    if(result$state_prob < 3) {
+      recommendations <- c(recommendations, 
+                           paste0("• Try a state with more sightings like Washington, California, or Florida"))
+    }
+    
+    if(result$season_prob < 20) {
+      recommendations <- c(recommendations,
+                           "• Summer and Fall have the highest sighting rates")
+    }
+    
+    if(result$moon_prob < 10) {
+      recommendations <- c(recommendations,
+                           "• New Moon phases (darker nights) have more sightings")
+    }
+    
+    if(input$pred_time %in% c("morning", "afternoon")) {
+      recommendations <- c(recommendations,
+                           "• Dawn and dusk are peak sighting times")
+    }
+    
+    if(input$pred_visibility > 7) {
+      recommendations <- c(recommendations,
+                           "• Lower visibility conditions correlate with more sightings")
+    }
+    
+    if(length(recommendations) == 0) {
+      recommendations <- c("• Your conditions are already optimal! Get out there and start searching!")
+    }
+    
+    div(style = "color: #e4e4e4; font-size: 14px;",
+        HTML(paste(recommendations, collapse = "<br>")))
+  })
   # ============================================
   # Correlation tab graphs and text
   # ============================================

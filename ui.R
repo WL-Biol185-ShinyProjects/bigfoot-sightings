@@ -6,6 +6,7 @@ library(sf)
 library(dplyr)
 library(lubridate)
 
+# Layout for all dropdowns
 ui <- fluidPage(
   tags$head(
     tags$style(HTML("
@@ -36,6 +37,7 @@ ui <- fluidPage(
     "))
   ),
 
+  # start of webpage
 navbarPage(
   title = div(
     style = "display: flex; align-items: center;",
@@ -504,6 +506,95 @@ tabPanel("Topographic Map",
                p(style = "font-size: 15px; line-height: 1.6;", "This interactive map displays topographic information for the United States along with documented Bigfoot sighting locations."),
                p(style = "font-size: 15px; line-height: 1.6;", strong("Features:"), " Each blue dot represents a reported Bigfoot sighting. Click on any dot to see its exact coordinates. The OpenTopoMap background provides detailed topographic visualization including contour lines and terrain shading."),
                p(style = "font-size: 15px; line-height: 1.6;", strong("Data Sources:"), " OpenTopoMap tiles for topographic features and filtered_bigfoot_data.csv for sighting locations.")
+           )
+         )
+),
+
+# Add this tabPanel to your navbarPage in the UI, after the "Topographic Map" tab and before "About Us"
+
+tabPanel("Bigfoot Probability Predictor",
+         fluidPage(
+           style = "padding: 40px 20px;",
+           
+           div(style = "text-align: center; margin-bottom: 40px;",
+               tags$h1(style = "color: #f9ca24; font-size: 48px;", "Will You Spot Bigfoot?"),
+               tags$p(style = "font-size: 18px; color: #e4e4e4;", 
+                      "Enter your conditions below to calculate your probability of a Bigfoot encounter!")
+           ),
+           
+           fluidRow(
+             # Input Panel
+             column(5,
+                    div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
+                        h3("Your Conditions", style = "color: #ff6b6b; margin-bottom: 20px;"),
+                        
+                        selectInput("pred_state", "Select State:",
+                                    choices = NULL,
+                                    selected = NULL),
+                        
+                        selectInput("pred_season", "Select Season:",
+                                    choices = c("Spring", "Summer", "Fall", "Winter"),
+                                    selected = "Summer"),
+                        
+                        sliderInput("pred_temp", "Temperature (°F):",
+                                    min = 0, max = 100, value = 65, step = 5),
+                        
+                        sliderInput("pred_moon", "Moon Phase:",
+                                    min = 0, max = 1, value = 0.5, step = 0.1,
+                                    post = ""),
+                        
+                        selectInput("pred_time", "Time of Day:",
+                                    choices = c("Dawn (5am-7am)" = "dawn",
+                                                "Morning (7am-12pm)" = "morning", 
+                                                "Afternoon (12pm-5pm)" = "afternoon",
+                                                "Dusk (5pm-7pm)" = "dusk",
+                                                "Night (7pm-5am)" = "night"),
+                                    selected = "dusk"),
+                        
+                        sliderInput("pred_visibility", "Visibility (miles):",
+                                    min = 0, max = 10, value = 5, step = 0.5),
+                        
+                        hr(),
+                        
+                        actionButton("calculate_prob", "Calculate My Chances!",
+                                     class = "btn-primary btn-lg",
+                                     style = "width: 100%; font-size: 18px;")
+                    )
+             ),
+             
+             # Results Panel
+             column(7,
+                    div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); min-height: 600px;",
+                        h3("Your Bigfoot Encounter Probability", style = "color: #f9ca24; text-align: center;"),
+                        
+                        # Probability Display
+                        div(style = "text-align: center; margin: 40px 0;",
+                            uiOutput("probability_display")
+                        ),
+                        
+                        # Gauge/Meter visualization
+                        plotOutput("probability_gauge", height = "200px"),
+                        
+                        hr(),
+                        
+                        # Breakdown by factor
+                        h4("Factor Breakdown:", style = "color: #ff6b6b; margin-top: 20px;"),
+                        uiOutput("factor_breakdown"),
+                        
+                        hr(),
+                        
+                        # Recommendations
+                        h4("Tips to Increase Your Chances:", style = "color: #4ecdc4; margin-top: 20px;"),
+                        uiOutput("recommendations")
+                    )
+             )
+           ),
+           
+           # Educational Note
+           div(style = "background-color: #2c3e50; padding: 20px; border-radius: 12px; margin-top: 30px; text-align: center;",
+               tags$p(style = "font-size: 14px; color: #e4e4e4; font-style: italic;",
+                      "Note: This predictor is based on historical sighting data patterns and is intended for educational and entertainment purposes. 
+                      Actual Bigfoot encounters cannot be predicted with certainty!")
            )
          )
 ),
