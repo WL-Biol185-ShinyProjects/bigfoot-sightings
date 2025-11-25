@@ -6,17 +6,36 @@ library(sf)
 library(dplyr)
 library(lubridate)
 
-# making all dropdowns black
 ui <- fluidPage(
   tags$head(
     tags$style(HTML("
-      select, option, .selectize-input, .selectize-dropdown, .selectize-dropdown-content {
+      /* Selected item display (what shows in the box after selection) */
+      .selectize-input {
+        color: #2c3e50 !important;
+        background-color: #FFFFFF !important;
+      }
+      
+      /* Dropdown menu options */
+      .selectize-dropdown, .selectize-dropdown-content, .selectize-dropdown .option {
+        color: #FFFFFF !important;
+        background-color: #2c3e50 !important;
+      }
+      
+      /* Hover effect - matching navbar style */
+      .selectize-dropdown .option:hover,
+      .selectize-dropdown .active {
+        background-color: rgba(255, 107, 107, 0.1) !important;
+        color: #ff6b6b !important;
+      }
+      
+      /* Selected option in dropdown (when highlighted/chosen) */
+      .selectize-dropdown .option.selected {
         color: #000000 !important;
         background-color: #FFFFFF !important;
       }
     "))
   ),
-  
+
 navbarPage(
   title = div(
     style = "display: flex; align-items: center;",
