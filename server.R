@@ -221,9 +221,14 @@ function(input, output, session) {
   filtered_sf <- reactive({
     data <- bigfoot_sf()
     
-    # Filter by year (cumulative up to selected year)
-    data <- data %>%
-      filter(year <= input$year_slider)
+    # Filter by year based on view mode
+    if (input$view_mode == "cumulative") {
+      data <- data %>%
+        filter(year <= input$year_slider)
+    } else {
+      data <- data %>%
+        filter(year == input$year_slider)
+    }
     
     # Filter by selected state if not "All States"
     if(!is.null(input$map_state) && input$map_state != "All States") {
