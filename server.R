@@ -1115,6 +1115,25 @@ function(input, output, session) {
                         moon_prob * 0.15 + 
                         vis_prob * 0.10) * 100
     
+    # NEW: Check for exact matches in the data
+    # Merge moon phase data with main data if possible
+    if("date" %in% names(data) && "date" %in% names(moon_data)) {
+      data_with_moon <- data %>% left_join(moon_data %>% select(date, moon_phase), by = "date")
+    } else {
+      data_with_moon <- data
+    }
+    
+    # Find exact matches
+    exact_matches <- data_with_moon %>%
+      filter(
+        state == input$pred_state,
+        season == input$pred_season,
+        abs(temperature_high - input$pred_temp) <= 10,
+        if("moon_phase" %in% names(.)) abs(moon_phase - input$pred_moon) <= 0.1 else TRUE,
+        abs(visibility - input$pred_visibility) <= 2
+      ) %>%
+      nrow()
+    
     # Create result list
     list(
       total_prob = combined_prob,
@@ -1124,7 +1143,9 @@ function(input, output, session) {
       moon_prob = moon_prob * 100,
       vis_prob = vis_prob * 100,
       state_sightings = state_sightings,
-      season_sightings = season_sightings
+      season_sightings = season_sightings,
+      exact_matches = exact_matches,
+      total_sightings = total_sightings
     )
   })
   
@@ -1154,7 +1175,10 @@ function(input, output, session) {
                "Moderate Chance - Stay alert!"
              } else {
                "High Chance - Bigfoot territory!"
-             })
+             }),
+      tags$p(style = "font-size: 16px; color: #4ecdc4; margin-top: 15px;",
+             paste0(result$exact_matches, " out of ", result$total_sightings, 
+                    " historical sightings matched your conditions!"))
     )
   })
   

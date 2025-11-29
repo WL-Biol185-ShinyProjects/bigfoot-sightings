@@ -528,7 +528,7 @@ tabPanel("Topographic Map",
          )
 ),
 
-# Add this tabPanel to your navbarPage in the UI, after the "Topographic Map" tab and before "About Us"
+#Bigfoot probability predictor 
 
 tabPanel("Bigfoot Probability Predictor",
          fluidPage(
@@ -614,7 +614,7 @@ tabPanel("Bigfoot Probability Predictor",
                       "Note: This predictor is based on historical sighting data patterns and is intended for educational and entertainment purposes. 
                       Actual Bigfoot encounters cannot be predicted with certainty!")
            )
-         )
+         )#Fluid page end
 ),
 
   # ABOUT US
