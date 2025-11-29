@@ -216,7 +216,7 @@ navbarPage(
       tags$img(id = "moving-image", 
                src = "new-bigfoot-image-removebg-preview.png",
                width = "300px")
-    )
+    )#fluid page end 
   ),
   
   # WORD CLOUD
@@ -659,11 +659,19 @@ tabPanel("Bigfoot Probability Predictor",
                      tags$p(style = "font-size: 16px; line-height: 1.8;", "This application was developed as part of a data visualization project. For questions or feedback, please contact Gregg Whitworth / gwhitworth@wlu.edu.")
                  ),
                  
+                 # Download Data Section
+                 div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); text-align: center;",
+                     tags$h3("Want to explore the bigfoot data? Download the data we used to create this website!", 
+                             style = "color: #f9ca24; margin-bottom: 25px; line-height: 1.4;"),
+                     downloadButton("downloadData", "Download Bigfoot Data", 
+                                    style = "background-color: #ff6b6b; color: white; font-size: 18px; font-weight: bold; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,107,107,0.4);")
+                 ),
+                 
                  div(style = "text-align: center; margin-top: 50px; color: #999;",
                      tags$p(tags$em("Last updated: November 2025"))
                  )
              )
-           )
+           )#fluid page end
   )
 )
 )

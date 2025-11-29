@@ -37,6 +37,20 @@ function(input, output, session) {
   )
   
   # ============================================
+  # Download button on about us page
+  # ============================================
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      "bigfoot_data.csv"
+    },
+    content = function(file) {
+      file.copy("bigfoot_data.csv", file)
+    }
+  )
+  
+  
+  
+  # ============================================
   # WORD CLOUD
   # ============================================
   output$WordCloud <- renderPlot({
