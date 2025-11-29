@@ -41,10 +41,10 @@ function(input, output, session) {
   # ============================================
   output$downloadData <- downloadHandler(
     filename = function() {
-      "bigfoot_data.csv"
+      "bigfoot_data_clean.csv"
     },
     content = function(file) {
-      file.copy("bigfoot_data.csv", file)
+      file.copy("bigfoot_data_clean.csv", file)
     }
   )
   
