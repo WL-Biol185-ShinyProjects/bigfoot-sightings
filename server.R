@@ -1537,22 +1537,22 @@ output$recommendations <- renderUI({
            "model2" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
              h4("Forest Land Area"),
-             p("This model looks at the total forest land area in thousand miles. Larger forested areas may correlate with more sightings due to greater wilderness exposure and exploration. This correlation is actually strong but this may be because larger states with more forests may be larger overall and thus have more people residing in them to make the observations.")
+             p("This model looks at the total forest land area in units of thousand miles of land. Larger forested areas may correlate with more sightings due to greater wilderness that Bigfoot can live in and more people will be willing to explore those areas. This correlation is actually strong but this may be because larger states with more forests may be larger overall and thus have more people residing in them to make the observations.")
            ),
            "model3" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
              h4("Census Land Area"),
-             p("This model analyzes the total land area of each state with Bigfoot sightings. Larger states may have more sightings simply due to more available territory and population exposure to wilderness areas. This correlation is weak however providing more evidence that the best way to tell which states will have more Bigfoot sightings is by how much total land of forest there is in the state.")
+             p("This model analyzes the total land area of each state with Bigfoot sightings. Larger states may have more sightings simply due to more total land to make the sightings and a larger population so there are more people who can make a sighting. This correlation is weak however providing more evidence that the best way to tell which states will have more Bigfoot sightings is by how much total land of forest there is in the state.")
            ),
            "model4" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
              h4("Bear Sightings by State"),
-             p("This model explores whether bear sightings at the state level correlate with Bigfoot sightings. The hypothesis is that if people are mistaking bears for Bigfoot, we would see a strong positive correlation between the two. Alternatively, both bears and Bigfoot may simply prefer similar habitats (forested wilderness areas), which could also explain a correlation.")
+             p("This model explores whether bear sightings at the state level correlate with Bigfoot sightings. The hypothesis is that if people are mistaking bears for Bigfoot, we would see a strong positive correlation between the two. Alternatively, both bears and Bigfoot may simply prefer similar habitats (forested wilderness areas), which could also explain a correlation. We see a slight correlation showing that people may be mistaking bears they see for.")
            ),
            "model5" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
              h4("Bear Sightings by County"),
-             p("This model examines the relationship between bear and Bigfoot sightings at a more granular county level. A county-level analysis provides more data points and controls for within-state variation, potentially revealing whether the bear-Bigfoot correlation holds when examining smaller geographic areas where habitat conditions are more uniform.")
+             p("This model examines the relationship between bear and Bigfoot sightings at a more granular county level. A county-level analysis provides more data points and controls for within-state variation, potentially revealing whether the bear-Bigfoot correlation holds when examining smaller geographic areas where habitat conditions are more uniform. This reveals a strong correlation showing maybe bears and Bigfoot can co-exist.")
            )
     )
   })
