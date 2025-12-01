@@ -432,16 +432,16 @@ tabPanel("Correlations",
                                        "Census Land Area" = "model3",
                                        "Bear Sightings by State" = "model4",
                                        "Bear Sightings by County" = "model5"),
-                           selected = "model1")
+                           selected = "model1"),
+               uiOutput("modelDescription")
              ),
              
              mainPanel(
-               plotOutput("scatterPlot", height = "1000px"),
-               verbatimTextOutput("modelStats"),
-               uiOutput("modelDescription")
+               plotOutput("scatterPlot", height = "800px"),
+               verbatimTextOutput("modelStats")
              )
            )
-         )  
+         )
 ),
 
 
