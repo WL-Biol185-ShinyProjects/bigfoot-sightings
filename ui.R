@@ -528,7 +528,7 @@ tabPanel("Topographic Map",
          )
 ),
 
-#Bigfoot probability predictor 
+# BIGFOOT PROBABILITY PREDICTOR 
 
 tabPanel("Bigfoot Probability Predictor",
          fluidPage(
@@ -634,9 +634,9 @@ tabPanel("Bigfoot Probability Predictor",
                          tags$img(src = "Bigfoot_Selfie.png", width = "600px", style = "border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);")
                      ),
                      tags$p(style = "font-size: 15px; line-height: 1.7; margin-top: 20px;", strong("Sophia Taylor (far left)"), " is a Neuroscience and Spanish double major on the pre-med track from Pennsylvania. On campus she is a Community Assistant for Residence Life, Vice President of Recruitment for Panhellenic Council, President of the LEAD program, President of the Pre-Health club, member of the Leadership Excellence Awards Committee, member of Alpha Delta Pi, Traveller and University Store employee, and does research in the Neuroscience Department at W&L."),
-                     tags$p(style = "font-size: 15px; line-height: 1.7;", strong("Jake Walters (second from left)"), " is a Neuroscience major on the pre-med track from Kentucky. On campus he is collecting all the frat infinity stones: Phi delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, logistics chair of Remote Area Medical, and is a Sustainability intern."),
+                     tags$p(style = "font-size: 15px; line-height: 1.7;", strong("Jake Walters (second from left)"), " is a Neuroscience major on the pre-med track from Kentucky. On campus he is collecting all the frat infinity stones: Phi Delt, Fiji, and now Phi Psi, ILoveWater club co-president, Campus Kitchen Shift Leader, logistics chair of Remote Area Medical, and is a Sustainability intern."),
                      tags$p(style = "font-size: 15px; line-height: 1.7;", strong("Ella Moser (second from right)"), " is a Biology major and art history minor on the pre-med track from Florida. On campus she is the president of Washington and Lee Brain Exercise Initiative, a member of the Generals Activity board, and a member of Remote Area Medical."),
-                     tags$p(style = "font-size: 15px; line-height: 1.7;", strong("Sarah Stockton (far right)"), " is a Neuroscience and Politics double major on the pre-med track from North Carolina. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Office and a member of Pi Beta Phi.")
+                     tags$p(style = "font-size: 15px; line-height: 1.7;", strong("Sarah Stockton (far right)"), " is a Neuroscience and Politics double major on the pre-med track from North Carolina. On campus she is in W&L Dance Company, a Kathekon Program Ambassador, University Ambassador, an Interview Fellow in the W&L Admissions Office, and a member of Pi Beta Phi.")
                  ),
                  
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
@@ -651,7 +651,10 @@ tabPanel("Bigfoot Probability Predictor",
                  
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
                      tags$h3("Data Sources", style = "color: #f9ca24; margin-bottom: 20px;"),
-                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Our data comes from the Bigfoot Field Researchers Organization (BFRO) database, which contains thousands of reported sightings dating back several decades. Weather data is sourced from historical meteorological records.")
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Our Bigfoot Data comes from the Bigfoot Field Researchers Organization (BFRO) database via Timothy Renner, which contains thousands of reported sightings dating back several decades: https://data.world/timothyrenner/bfro-sightings-data"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Weather Data is sourced from historical meteorological records..."), 
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Forest and Land Area data is sourced from..."),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Bear Observations data is sourced from the Global Biodiversity Information Facility (GBIF) via iNaturalist Research Grade Observations of Ursus americanus Pallus and Ursus linnaeus: https://doi.org/10.15468/dl.kp96h3")
                  ),
                  
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",

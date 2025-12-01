@@ -35,7 +35,7 @@ https://data.world/timothyrenner/bfro-sightings-data
 
 
 ### Forest and Land Data
-The data used to calculate the correlation for land size, forest size, and percent of state cpvered in forest was taken from this pdf. Table B-11 was used. It was converted into an excel file from a pdf and edited further in excel.
+The data used to calculate the correlation for land size, forest size, and percent of state covered in forest was taken from this pdf published by the US Department of Agriculture in 2016. Table B-11 was used. It was converted into an excel file from a pdf and edited further in excel.
 The rows giving totals for regions of the U.S. were deleted. Any row that was not a U.S. state was deleted. the columns "Annual inventory entry date" and "State annualized as of 2016" were deleted. Commas were removed from all numbers.
 The file was then converted into a csv file so that it could be used for data manipulation. 
 https://www.fs.usda.gov/sites/default/files/fs_media/fs_document/publication-15817-usda-forest-service-fia-annual-report-508.pdf
