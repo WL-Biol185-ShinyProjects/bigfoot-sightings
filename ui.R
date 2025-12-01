@@ -664,7 +664,7 @@ tabPanel("Bigfoot Probability Predictor",
                  
                  # Download Data Section
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); text-align: center;",
-                     tags$h3("Want to explore the bigfoot data? Download the data we used to create this website!", 
+                     tags$h3("Download our refined data set that we used to create the web applications you see! The original data set is linked above", 
                              style = "color: #f9ca24; margin-bottom: 25px; line-height: 1.4;"),
                      downloadButton("downloadData", "Download Bigfoot Data", 
                                     style = "background-color: #ff6b6b; color: white; font-size: 18px; font-weight: bold; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,107,107,0.4);")
