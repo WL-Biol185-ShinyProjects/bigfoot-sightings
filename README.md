@@ -25,15 +25,10 @@ per moon phase, and the correlation between moon brightness and number of sighti
 
 ### Bigfoot Sightings Data
 Our data comes from the Bigfoot Field Researchers Organization (BFRO) database via Timothy Renner, which contains thousands of 
-reported sightings dating back several decades. 
+reported sightings dating back several decades. Weather data included comes from historic meteorological sources.
 
 Please see Timothy Renner's GitHub repository to obtain data:
 https://github.com/timothyrenner/bfro_sightings_data
-
-
-### Weather Data
-
-
 
 ### Forest and Land Data
 The data used to calculate the correlation for land size, forest size, and percent of state covered in forest was taken from this pdf published by the US Department of Agriculture in 2016. Table B-11 was used. It was converted into an excel file from a pdf and edited further in excel.

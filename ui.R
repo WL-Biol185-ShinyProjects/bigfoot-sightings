@@ -651,10 +651,12 @@ tabPanel("Bigfoot Probability Predictor",
                  
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
                      tags$h3("Data Sources", style = "color: #f9ca24; margin-bottom: 20px;"),
-                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Our Bigfoot Data comes from the Bigfoot Field Researchers Organization (BFRO) database via Timothy Renner, which contains thousands of reported sightings dating back several decades: https://github.com/timothyrenner/bfro_sightings_data"),
-                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Weather Data is sourced from historical meteorological records..."), 
-                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Forest and Land Area data is sourced from..."),
-                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Bear Observations data is sourced from the Global Biodiversity Information Facility (GBIF) via iNaturalist Research Grade Observations of Ursus americanus Pallus and Ursus linnaeus: https://doi.org/10.15468/dl.kp96h3")
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Our Bigfoot Data comes from the Bigfoot Field Researchers Organization (BFRO) database via Timothy Renner, which contains thousands of reported sightings dating back several decades. Weather data is sourced from historical meteorological records:"), 
+                      tags$a(style = "font-size: 16px; line-height: 1.8;" , href = "https://github.com/timothyrenner/bfro_sightings_data", "Bigfoot Sightings Data", target = "_blank"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Forest and Land Area data is sourced from the USDA Forest Inventory and Analysis 2016 Report:"),
+                      tags$a(style = "font-size: 16px; line-height: 1.8;" , href = "https://www.fs.usda.gov/sites/default/files/fs_media/fs_document/publication-15817-usda-forest-service-fia-annual-report-508.pdf", "Forest and Land Area Data", target = "_blank"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Bear Observations data is sourced from the Global Biodiversity Information Facility (GBIF) via iNaturalist Research Grade Observations of Ursus americanus Pallus and Ursus linnaeus:"),
+                      tags$a(style = "font-size: 16px; line-height: 1.8;", href = "https://doi.org/10.15468/dl.kp96h3", "Bear Observations Data", target = "_blank")
                  ),
                  
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
@@ -671,7 +673,7 @@ tabPanel("Bigfoot Probability Predictor",
                  ),
                  
                  div(style = "text-align: center; margin-top: 50px; color: #999;",
-                     tags$p(tags$em("Last updated: November 2025"))
+                     tags$p(tags$em("Last updated: December 2025"))
                  )
              )
            )#fluid page end
