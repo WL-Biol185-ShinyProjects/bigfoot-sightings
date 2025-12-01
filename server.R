@@ -1427,7 +1427,7 @@ function(input, output, session) {
            "model4" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
              h4("Bear Sightings by State"),
-             p("This model explores whether bear sightings at the state level correlate with Bigfoot sightings. The hypothesis is that if people are mistaking bears for Bigfoot, we would see a strong positive correlation between the two. Alternatively, both bears and Bigfoot may simply prefer similar habitats (forested wilderness areas), which could also explain a correlation. We see, hoever, that there is not a strong correlation and thus it might be that bears actually scare away Bigfoot.")
+             p("This model explores whether bear sightings at the state level correlate with Bigfoot sightings. The hypothesis is that if people are mistaking bears for Bigfoot, we would see a strong positive correlation between the two. Alternatively, both bears and Bigfoot may simply prefer similar habitats (forested wilderness areas), which could also explain a correlation. We see a slight correlation showing that people may be mistaking bears they see for.")
            ),
            "model5" = div(
              style = "background-color: #1e272e; color: #f9ca24; padding: 15px; margin-top: 20px; border-radius: 5px;",
