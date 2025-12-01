@@ -537,7 +537,9 @@ tabPanel("Bigfoot Probability Predictor",
            div(style = "text-align: center; margin-bottom: 40px;",
                tags$h1(style = "color: #f9ca24; font-size: 48px;", "Will You Spot Bigfoot?"),
                tags$p(style = "font-size: 18px; color: #e4e4e4;", 
-                      "Enter your conditions below to calculate your probability of a Bigfoot encounter!")
+                      "Enter your conditions below to find the historical probability of a Bigfoot encounter!"),
+               tags$p(style = "font-size: 14px; color: #ff6b6b; font-style: italic;",
+                      "This calculator uses exact matches from our database of historical sightings")
            ),
            
            fluidRow(
@@ -558,8 +560,13 @@ tabPanel("Bigfoot Probability Predictor",
                                     min = 0, max = 100, value = 65, step = 5),
                         
                         sliderInput("pred_moon", "Moon Phase:",
-                                    min = 0, max = 1, value = 0.5, step = 0.1,
+                                    min = 0, max = 1, value = 0.5, step = 0.125,
                                     post = ""),
+                        
+                        div(style = "margin-bottom: 15px;",
+                            tags$small(style = "color: #e4e4e4;",
+                                       "0 = New Moon (dark), 0.5 = Full Moon (bright), 1 = New Moon")
+                        ),
                         
                         selectInput("pred_time", "Time of Day:",
                                     choices = c("Dawn (5am-7am)" = "dawn",
@@ -570,7 +577,7 @@ tabPanel("Bigfoot Probability Predictor",
                                     selected = "dusk"),
                         
                         sliderInput("pred_visibility", "Visibility (miles):",
-                                    min = 0, max = 10, value = 5, step = 0.5),
+                                    min = 0, max = 20, value = 5, step = 1),
                         
                         hr(),
                         
@@ -596,13 +603,13 @@ tabPanel("Bigfoot Probability Predictor",
                         hr(),
                         
                         # Breakdown by factor
-                        h4("Factor Breakdown:", style = "color: #ff6b6b; margin-top: 20px;"),
+                        h4("Your Condition Profile:", style = "color: #ff6b6b; margin-top: 20px;"),
                         uiOutput("factor_breakdown"),
                         
                         hr(),
                         
                         # Recommendations
-                        h4("Tips to Increase Your Chances:", style = "color: #4ecdc4; margin-top: 20px;"),
+                        h4("Insights & Tips:", style = "color: #4ecdc4; margin-top: 20px;"),
                         uiOutput("recommendations")
                     )
              )
@@ -610,9 +617,10 @@ tabPanel("Bigfoot Probability Predictor",
            
            # Educational Note
            div(style = "background-color: #2c3e50; padding: 20px; border-radius: 12px; margin-top: 30px; text-align: center;",
-               tags$p(style = "font-size: 14px; color: #e4e4e4; font-style: italic;",
-                      "Note: This predictor is based on historical sighting data patterns and is intended for educational and entertainment purposes. 
-                      Actual Bigfoot encounters cannot be predicted with certainty!")
+               tags$p(style = "font-size: 14px; color: #e4e4e4; font-style: italic; margin: 0;",
+                      "Note: This predictor uses a 6-dimensional matrix lookup of historical sighting data. 
+                      Percentages represent the exact proportion of all sightings that occurred under your specified conditions. 
+                      Results are for educational and entertainment purposes!")
            )
          )#Fluid page end
 ),
