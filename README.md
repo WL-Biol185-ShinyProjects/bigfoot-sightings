@@ -27,7 +27,8 @@ per moon phase, and the correlation between moon brightness and number of sighti
 Our data comes from the Bigfoot Field Researchers Organization (BFRO) database via Timothy Renner, which contains thousands of 
 reported sightings dating back several decades. 
 
-https://data.world/timothyrenner/bfro-sightings-data
+Please see Timothy Renner's GitHub repository to obtain data:
+https://github.com/timothyrenner/bfro_sightings_data
 
 
 ### Weather Data

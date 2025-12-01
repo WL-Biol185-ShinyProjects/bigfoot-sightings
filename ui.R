@@ -651,7 +651,7 @@ tabPanel("Bigfoot Probability Predictor",
                  
                  div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
                      tags$h3("Data Sources", style = "color: #f9ca24; margin-bottom: 20px;"),
-                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Our Bigfoot Data comes from the Bigfoot Field Researchers Organization (BFRO) database via Timothy Renner, which contains thousands of reported sightings dating back several decades: https://data.world/timothyrenner/bfro-sightings-data"),
+                     tags$p(style = "font-size: 16px; line-height: 1.8;", "Our Bigfoot Data comes from the Bigfoot Field Researchers Organization (BFRO) database via Timothy Renner, which contains thousands of reported sightings dating back several decades: https://github.com/timothyrenner/bfro_sightings_data"),
                      tags$p(style = "font-size: 16px; line-height: 1.8;", "Weather Data is sourced from historical meteorological records..."), 
                      tags$p(style = "font-size: 16px; line-height: 1.8;", "Forest and Land Area data is sourced from..."),
                      tags$p(style = "font-size: 16px; line-height: 1.8;", "Bear Observations data is sourced from the Global Biodiversity Information Facility (GBIF) via iNaturalist Research Grade Observations of Ursus americanus Pallus and Ursus linnaeus: https://doi.org/10.15468/dl.kp96h3")
