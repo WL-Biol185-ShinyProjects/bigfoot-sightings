@@ -1382,6 +1382,107 @@ function(input, output, session) {
         head(3)
       
       recommendations <- c(recommendations,
+                           paste0("🗺️ Top states: ", paste(best_states$state, collapse = ", ")))
+      
+      # Best season
+      best_season <- matrix %>%
+        filter(state == input$pred_state) %>%
+        group_by(season) %>%
+        summarise(avg_prob = mean(percentage)) %>%
+        arrange(desc(avg_prob)) %>%
+        head(1)
+      
+      recommendations <- c(recommendations,
+                           paste0("📅 Best season in ", input$pred_state, ": ", best_season$season[1]))
+      
+      # Time tip
+      recommendations <- c(recommendations,
+                           "🌅 Prime times: Dawn (5-7am) and Dusk (5-7pm)")
+      
+    } else if(index_value < 0) {
+      recommendations <- c(recommendations,
+                           "📊 Your conditions are below average",
+                           "💡 Small adjustments could improve your index",
+                           "🌙 Try darker moon phases (New Moon)")
+    } else if(index_value < 50) {
+      recommendations <- c(recommendations,
+                           "✓ Decent conditions - you're on the right track!",
+                           "📸 Keep your camera ready",
+                           "👂 Stay alert for unusual sounds")
+    } else {
+      recommendations <- c(recommendations,
+                           "🎯 Excellent! These are prime Bigfoot conditions!",
+                           "📸 Definitely bring high-quality recording equipment",
+                           "👥 Consider bringing witnesses",
+                           "🔦 Have a backup flashlight ready")
+    }
+    
+    div(style = "color: #e4e4e4; font-size: 14px; line-height: 1.8;",
+        HTML(paste(recommendations, collapse = "<br>")))
+  })
+  
+  # Best conditions for selected state
+  output$state_best_conditions <- renderUI({
+    req(input$pred_state)
+    
+    matrix <- probability_matrix()
+    
+    # Find best conditions for this state
+    state_data <- matrix %>%
+      filter(state == input$pred_state) %>%
+      arrange(desc(percentage)) %>%
+      head(1)
+    
+    if(nrow(state_data) > 0) {
+      tagList(
+        div(style = "background-color: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px;",
+            tags$h4(style = "color: #4ecdc4; margin-top: 0;", 
+                    paste0("Best Historical Conditions in ", input$pred_state)),
+            div(style = "color: #e4e4e4; font-size: 14px; line-height: 1.6;",
+                tags$p(style = "margin: 8px 0;",
+                       tags$strong(style = "color: #f9ca24;", "Season: "),
+                       state_data$season[1]),
+                tags$p(style = "margin: 8px 0;",
+                       tags$strong(style = "color: #f9ca24;", "Temperature: "),
+                       state_data$temp_bin[1]),
+                tags$p(style = "margin: 8px 0;",
+                       tags$strong(style = "color: #f9ca24;", "Moon Phase: "),
+                       state_data$moon_bin[1]),
+                tags$p(style = "margin: 8px 0;",
+                       tags$strong(style = "color: #f9ca24;", "Time: "),
+                       state_data$time_bin[1]),
+                tags$p(style = "margin: 8px 0;",
+                       tags$strong(style = "color: #f9ca24;", "Visibility: "),
+                       state_data$vis_bin[1]),
+                tags$p(style = "margin: 15px 0 0 0; color: #4ecdc4; font-weight: bold;",
+                       paste0(state_data$count[1], " sightings under these exact conditions (",
+                              round(state_data$percentage[1], 2), "% of all sightings)"))
+            )
+        )
+      )
+    }
+  })
+  
+  # Recommendations
+  output$recommendations <- renderUI({
+    req(input$calculate_prob)
+    result <- matrix_probability_result()
+    matrix <- probability_matrix()
+    
+    recommendations <- list()
+    index_value <- result$encounter_index
+    
+    if(index_value < -50) {
+      # Poor conditions - give specific improvement tips
+      
+      # Best state overall
+      best_states <- matrix %>%
+        group_by(state) %>%
+        summarise(avg_prob = mean(percentage)) %>%
+        arrange(desc(avg_prob)) %>%
+        head(3)
+      
+      recommendations <- c(recommendations,
                            paste0(" Top states: ", paste(best_states$state, collapse = ", ")))
       
       # Best season
