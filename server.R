@@ -1382,7 +1382,7 @@ function(input, output, session) {
         head(3)
       
       recommendations <- c(recommendations,
-                           paste0("🗺️ Top states: ", paste(best_states$state, collapse = ", ")))
+                           paste0(" Top states: ", paste(best_states$state, collapse = ", ")))
       
       # Best season
       best_season <- matrix %>%
@@ -1393,28 +1393,28 @@ function(input, output, session) {
         head(1)
       
       recommendations <- c(recommendations,
-                           paste0("📅 Best season in ", input$pred_state, ": ", best_season$season[1]))
+                           paste0("Best season in ", input$pred_state, ": ", best_season$season[1]))
       
       # Time tip
       recommendations <- c(recommendations,
-                           "🌅 Prime times: Dawn (5-7am) and Dusk (5-7pm)")
+                           "Prime times: Dawn (5-7am) and Dusk (5-7pm)")
       
     } else if(index_value < 0) {
       recommendations <- c(recommendations,
-                           "📊 Your conditions are below average",
-                           "💡 Small adjustments could improve your index",
-                           "🌙 Try darker moon phases (New Moon)")
+                           "Your conditions are below average",
+                           "Small adjustments could improve your index",
+                           "Try darker moon phases (New Moon)")
     } else if(index_value < 50) {
       recommendations <- c(recommendations,
-                           "✓ Decent conditions - you're on the right track!",
-                           "📸 Keep your camera ready",
-                           "👂 Stay alert for unusual sounds")
+                           "Decent conditions - you're on the right track!",
+                           "Keep your camera ready",
+                           "Stay alert for unusual sounds")
     } else {
       recommendations <- c(recommendations,
-                           "🎯 Excellent! These are prime Bigfoot conditions!",
-                           "📸 Definitely bring high-quality recording equipment",
-                           "👥 Consider bringing witnesses",
-                           "🔦 Have a backup flashlight ready")
+                           "Excellent! These are prime Bigfoot conditions!",
+                           "Definitely bring high-quality recording equipment",
+                           "Consider bringing witnesses",
+                           "Have a backup flashlight ready")
     }
     
     div(style = "color: #e4e4e4; font-size: 14px; line-height: 1.8;",
