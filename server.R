@@ -1107,315 +1107,343 @@ function(input, output, session) {
     return(df)
   })
   
-
-# Create the lookup matrix
-probability_matrix <- reactive({
-  df <- bigfoot_matrix_data()
+  # Create the lookup matrix
+  probability_matrix <- reactive({
+    df <- bigfoot_matrix_data()
+    
+    total_sightings <- nrow(df)
+    
+    # Group by all 6 variables and calculate counts/percentages
+    matrix <- df %>%
+      group_by(state, season, temp_bin, moon_bin, time_bin, vis_bin) %>%
+      summarise(
+        count = n(),
+        .groups = "drop"
+      ) %>%
+      mutate(
+        percentage = (count / total_sightings) * 100
+      )
+    
+    return(matrix)
+  })
   
-  total_sightings <- nrow(df)
+  # Calculate average probability for normalization
+  average_probability <- reactive({
+    matrix <- probability_matrix()
+    mean(matrix$percentage, na.rm = TRUE)
+  })
   
-  # Group by all 6 variables and calculate counts/percentages
-  matrix <- df %>%
-    group_by(state, season, temp_bin, moon_bin, time_bin, vis_bin) %>%
-    summarise(
-      count = n(),
-      .groups = "drop"
-    ) %>%
-    mutate(
-      percentage = (count / total_sightings) * 100
+  # Update state choices for predictor
+  observe({
+    data <- bigfoot_matrix_data()
+    states <- sort(unique(data$state[!is.na(data$state)]))
+    
+    updateSelectInput(session, "pred_state",
+                      choices = states,
+                      selected = states[1])
+  })
+  
+  # Helper function to convert user inputs to bins
+  user_inputs_to_bins <- function(temp, vis, moon) {
+    
+    # Temperature bin
+    temp_bin <- case_when(
+      temp >= 0 & temp < 10 ~ "0-10°F",
+      temp >= 10 & temp < 20 ~ "10-20°F",
+      temp >= 20 & temp < 30 ~ "20-30°F",
+      temp >= 30 & temp < 40 ~ "30-40°F",
+      temp >= 40 & temp < 50 ~ "40-50°F",
+      temp >= 50 & temp < 60 ~ "50-60°F",
+      temp >= 60 & temp < 70 ~ "60-70°F",
+      temp >= 70 & temp < 80 ~ "70-80°F",
+      temp >= 80 & temp < 90 ~ "80-90°F",
+      temp >= 90 & temp <= 100 ~ "90-100°F",
+      TRUE ~ NA_character_
     )
-  
-  return(matrix)
-})
-
-# Update state choices for predictor
-observe({
-  data <- bigfoot_matrix_data()
-  states <- sort(unique(data$state[!is.na(data$state)]))
-  
-  updateSelectInput(session, "pred_state",
-                    choices = states,
-                    selected = states[1])
-})
-
-# Helper function to convert user inputs to bins
-user_inputs_to_bins <- function(temp, vis, moon) {
-  
-  # Temperature bin
-  temp_bin <- case_when(
-    temp >= 0 & temp < 10 ~ "0-10°F",
-    temp >= 10 & temp < 20 ~ "10-20°F",
-    temp >= 20 & temp < 30 ~ "20-30°F",
-    temp >= 30 & temp < 40 ~ "30-40°F",
-    temp >= 40 & temp < 50 ~ "40-50°F",
-    temp >= 50 & temp < 60 ~ "50-60°F",
-    temp >= 60 & temp < 70 ~ "60-70°F",
-    temp >= 70 & temp < 80 ~ "70-80°F",
-    temp >= 80 & temp < 90 ~ "80-90°F",
-    temp >= 90 & temp <= 100 ~ "90-100°F",
-    TRUE ~ NA_character_
-  )
-  
-  # Visibility bin
-  vis_bin <- case_when(
-    vis >= 0 & vis < 5 ~ "0-5 mi",
-    vis >= 5 & vis < 10 ~ "5-10 mi",
-    vis >= 10 & vis < 15 ~ "10-15 mi",
-    vis >= 15 & vis < 20 ~ "15-20 mi",
-    vis >= 20 ~ "20+ mi",
-    TRUE ~ NA_character_
-  )
-  
-  # Moon phase bin
-  moon_bin <- case_when(
-    moon >= 0 & moon < 0.125 ~ "New Moon",
-    moon >= 0.125 & moon < 0.25 ~ "Waxing Crescent",
-    moon >= 0.25 & moon < 0.375 ~ "First Quarter",
-    moon >= 0.375 & moon < 0.5 ~ "Waxing Gibbous",
-    moon >= 0.5 & moon < 0.625 ~ "Full Moon",
-    moon >= 0.625 & moon < 0.75 ~ "Waning Gibbous",
-    moon >= 0.75 & moon < 0.875 ~ "Last Quarter",
-    moon >= 0.875 & moon <= 1 ~ "Waning Crescent",
-    TRUE ~ NA_character_
-  )
-  
-  return(list(temp_bin = temp_bin, vis_bin = vis_bin, moon_bin = moon_bin))
-}
-
-# Lookup probability when button is clicked
-matrix_probability_result <- eventReactive(input$calculate_prob, {
-  
-  matrix <- probability_matrix()
-  
-  # Convert user inputs to bins
-  bins <- user_inputs_to_bins(input$pred_temp, input$pred_visibility, input$pred_moon)
-  
-  # Capitalize time input
-  time_display <- case_when(
-    input$pred_time == "dawn" ~ "Dawn",
-    input$pred_time == "morning" ~ "Morning",
-    input$pred_time == "afternoon" ~ "Afternoon",
-    input$pred_time == "dusk" ~ "Dusk",
-    input$pred_time == "night" ~ "Night",
-    TRUE ~ "Unknown"
-  )
-  
-  # Look up exact match in matrix
-  match <- matrix %>%
-    filter(
-      state == input$pred_state,
-      season == input$pred_season,
-      temp_bin == bins$temp_bin,
-      moon_bin == bins$moon_bin,
-      time_bin == time_display,
-      vis_bin == bins$vis_bin
+    
+    # Visibility bin
+    vis_bin <- case_when(
+      vis >= 0 & vis < 5 ~ "0-5 mi",
+      vis >= 5 & vis < 10 ~ "5-10 mi",
+      vis >= 10 & vis < 15 ~ "10-15 mi",
+      vis >= 15 & vis < 20 ~ "15-20 mi",
+      vis >= 20 ~ "20+ mi",
+      TRUE ~ NA_character_
     )
+    
+    # Moon phase bin
+    moon_bin <- case_when(
+      moon >= 0 & moon < 0.125 ~ "New Moon",
+      moon >= 0.125 & moon < 0.25 ~ "Waxing Crescent",
+      moon >= 0.25 & moon < 0.375 ~ "First Quarter",
+      moon >= 0.375 & moon < 0.5 ~ "Waxing Gibbous",
+      moon >= 0.5 & moon < 0.625 ~ "Full Moon",
+      moon >= 0.625 & moon < 0.75 ~ "Waning Gibbous",
+      moon >= 0.75 & moon < 0.875 ~ "Last Quarter",
+      moon >= 0.875 & moon <= 1 ~ "Waning Crescent",
+      TRUE ~ NA_character_
+    )
+    
+    return(list(temp_bin = temp_bin, vis_bin = vis_bin, moon_bin = moon_bin))
+  }
   
-  # Get total sightings for context
-  total_sightings <- nrow(bigfoot_matrix_data())
-  
-  if(nrow(match) > 0) {
-    # Exact match found
+  # Calculate Bigfoot Encounter Index
+  matrix_probability_result <- eventReactive(input$calculate_prob, {
+    
+    matrix <- probability_matrix()
+    avg_prob <- average_probability()
+    
+    # Convert user inputs to bins
+    bins <- user_inputs_to_bins(input$pred_temp, input$pred_visibility, input$pred_moon)
+    
+    # Capitalize time input
+    time_display <- case_when(
+      input$pred_time == "dawn" ~ "Dawn",
+      input$pred_time == "morning" ~ "Morning",
+      input$pred_time == "afternoon" ~ "Afternoon",
+      input$pred_time == "dusk" ~ "Dusk",
+      input$pred_time == "night" ~ "Night",
+      TRUE ~ "Unknown"
+    )
+    
+    # Look up exact match in matrix
+    match <- matrix %>%
+      filter(
+        state == input$pred_state,
+        season == input$pred_season,
+        temp_bin == bins$temp_bin,
+        moon_bin == bins$moon_bin,
+        time_bin == time_display,
+        vis_bin == bins$vis_bin
+      )
+    
+    # Get total sightings for context
+    total_sightings <- nrow(bigfoot_matrix_data())
+    
+    # Calculate raw probability
+    raw_percentage <- ifelse(nrow(match) > 0, match$percentage[1], 0)
+    
+    # Calculate Bigfoot Encounter Index (BEI)
+    # Scale: centered at 0 (average), ranges roughly from -100 to +100
+    # Formula: ((user_prob - avg_prob) / avg_prob) * 100
+    encounter_index <- ((raw_percentage - avg_prob) / avg_prob) * 100
+    
+    # Cap extreme values for better display
+    encounter_index <- max(min(encounter_index, 200), -100)
+    
     return(list(
-      percentage = round(match$percentage[1], 3),
-      count = match$count[1],
+      raw_percentage = round(raw_percentage, 4),
+      encounter_index = round(encounter_index, 1),
+      count = ifelse(nrow(match) > 0, match$count[1], 0),
       total_sightings = total_sightings,
-      found = TRUE,
+      average_prob = round(avg_prob, 4),
+      found = nrow(match) > 0,
       bins = bins,
       time_display = time_display
     ))
-  } else {
-    # No exact match - return 0%
-    return(list(
-      percentage = 0,
-      count = 0,
-      total_sightings = total_sightings,
-      found = FALSE,
-      bins = bins,
-      time_display = time_display
-    ))
-  }
-})
-
-# Display probability
-output$probability_display <- renderUI({
-  req(input$calculate_prob)
-  result <- matrix_probability_result()
+  })
   
-  prob_value <- result$percentage
-  
-  # Color based on probability
-  color <- if(prob_value == 0) {
-    "#666666"  # Gray for zero
-  } else if(prob_value < 0.1) {
-    "#ff6b6b"  # Low - red
-  } else if(prob_value < 0.5) {
-    "#f9ca24"  # Medium - yellow
-  } else {
-    "#4ecdc4"  # High - cyan
-  }
-  
-  div(
-    tags$h1(style = paste0("color: ", color, "; font-size: 72px; font-weight: bold; margin: 20px 0;"),
-            paste0(prob_value, "%")),
-    tags$p(style = "font-size: 20px; color: #e4e4e4;",
-           if(prob_value == 0) {
-             "No Historical Sightings - Uncharted Territory!"
-           } else if(prob_value < 0.1) {
-             "Very Rare Conditions - But not impossible!"
-           } else if(prob_value < 0.5) {
-             "Moderate Probability - Promising conditions!"
-           } else {
-             "High Probability - Prime Bigfoot conditions!"
-           }),
-    tags$p(style = "font-size: 16px; color: #4ecdc4; margin-top: 15px;",
-           paste0(result$count, " out of ", result$total_sightings, 
-                  " historical sightings matched your exact conditions"))
-  )
-})
-
-# Probability gauge visualization
-output$probability_gauge <- renderPlot({
-  req(input$calculate_prob)
-  result <- matrix_probability_result()
-  
-  # Cap display at 2% for gauge readability
-  prob <- min(result$percentage, 2)
-  max_display <- 2
-  
-  # Create gauge chart
-  par(bg = "#1a1a1a", mar = c(0, 0, 0, 0))
-  
-  # Draw arc
-  theta <- seq(pi, 0, length.out = 100)
-  x <- cos(theta)
-  y <- sin(theta)
-  
-  plot(x, y, type = "n", xlim = c(-1.2, 1.2), ylim = c(-0.2, 1.2),
-       axes = FALSE, xlab = "", ylab = "", asp = 1)
-  
-  # Background arc
-  lines(x, y, lwd = 20, col = "#2c3e50")
-  
-  # Filled arc based on probability
-  prob_theta <- seq(pi, pi - (prob/max_display) * pi, length.out = 100)
-  prob_x <- cos(prob_theta)
-  prob_y <- sin(prob_theta)
-  
-  # Color gradient
-  gauge_color <- if(prob == 0) "#666666" else if(prob < 0.1) "#ff6b6b" else if(prob < 0.5) "#f9ca24" else "#4ecdc4"
-  lines(prob_x, prob_y, lwd = 20, col = gauge_color)
-  
-  # Add labels
-  text(0, -0.1, "Historical Probability Meter", col = "white", cex = 1.2)
-  text(-1, 0, "0%", col = "white", cex = 1)
-  text(1, 0, paste0(max_display, "%"), col = "white", cex = 1)
-  
-  if(result$percentage > max_display) {
-    text(0, 0.5, paste0("(", result$percentage, "%)"), col = "#4ecdc4", cex = 1.5, font = 2)
-  }
-  
-}, bg = "#1a1a1a")
-
-# Factor breakdown
-output$factor_breakdown <- renderUI({
-  req(input$calculate_prob)
-  result <- matrix_probability_result()
-  
-  tagList(
-    div(style = "margin: 10px 0;",
-        tags$strong(style = "color: #f9ca24;", "State: "),
-        tags$span(style = "color: #e4e4e4;", input$pred_state)
-    ),
-    div(style = "margin: 10px 0;",
-        tags$strong(style = "color: #f9ca24;", "Season: "),
-        tags$span(style = "color: #e4e4e4;", input$pred_season)
-    ),
-    div(style = "margin: 10px 0;",
-        tags$strong(style = "color: #f9ca24;", "Temperature Range: "),
-        tags$span(style = "color: #e4e4e4;", result$bins$temp_bin)
-    ),
-    div(style = "margin: 10px 0;",
-        tags$strong(style = "color: #f9ca24;", "Moon Phase: "),
-        tags$span(style = "color: #e4e4e4;", result$bins$moon_bin)
-    ),
-    div(style = "margin: 10px 0;",
-        tags$strong(style = "color: #f9ca24;", "Time of Day: "),
-        tags$span(style = "color: #e4e4e4;", result$time_display)
-    ),
-    div(style = "margin: 10px 0;",
-        tags$strong(style = "color: #f9ca24;", "Visibility: "),
-        tags$span(style = "color: #e4e4e4;", result$bins$vis_bin)
-    ),
-    hr(),
-    div(style = "margin-top: 15px; padding: 15px; background-color: #1a1a1a; border-radius: 8px;",
-        tags$p(style = "color: #4ecdc4; margin: 0;",
-               if(result$found) {
-                 "✓ These exact conditions appear in our historical database"
-               } else {
-                 "✗ These exact conditions have never been recorded in our database"
-               })
-    )
-  )
-})
-
-# Recommendations
-output$recommendations <- renderUI({
-  req(input$calculate_prob)
-  result <- matrix_probability_result()
-  matrix <- probability_matrix()
-  
-  recommendations <- list()
-  
-  if(result$percentage == 0) {
-    # Find what would improve their chances
+  # Display Encounter Index
+  output$probability_display <- renderUI({
+    req(input$calculate_prob)
+    result <- matrix_probability_result()
     
-    # Best state
-    best_states <- matrix %>%
-      group_by(state) %>%
-      summarise(total_prob = sum(percentage)) %>%
-      arrange(desc(total_prob)) %>%
-      head(3)
+    index_value <- result$encounter_index
     
-    recommendations <- c(recommendations,
-                         paste0("• Try these high-activity states: ", 
-                                paste(best_states$state, collapse = ", ")))
-    
-    # Best season
-    best_seasons <- matrix %>%
-      group_by(season) %>%
-      summarise(total_prob = sum(percentage)) %>%
-      arrange(desc(total_prob)) %>%
-      head(1)
-    
-    if(input$pred_season != best_seasons$season[1]) {
-      recommendations <- c(recommendations,
-                           paste0("• ", best_seasons$season[1], 
-                                  " has the highest overall sighting rate"))
+    # Color and message based on index
+    if(index_value < -75) {
+      color <- "#e74c3c"  # Deep red
+      message <- "Extremely Unfavorable - Worst conditions possible!"
+      icon <- "❌"
+    } else if(index_value < -50) {
+      color <- "#ff6b6b"  # Red
+      message <- "Very Poor - Well below average conditions"
+      icon <- "⬇️"
+    } else if(index_value < -25) {
+      color <- "#ff9f43"  # Orange
+      message <- "Below Average - Not the best time"
+      icon <- "↘️"
+    } else if(index_value < 25) {
+      color <- "#f9ca24"  # Yellow
+      message <- "Near Average - Typical conditions"
+      icon <- "➡️"
+    } else if(index_value < 75) {
+      color <- "#26de81"  # Light green
+      message <- "Above Average - Good conditions!"
+      icon <- "↗️"
+    } else if(index_value < 125) {
+      color <- "#20bf6b"  # Green
+      message <- "Excellent - Well above average!"
+      icon <- "⬆️"
+    } else {
+      color <- "#4ecdc4"  # Cyan
+      message <- "Exceptional - Rare peak conditions!"
+      icon <- "🎯"
     }
     
-    # Moon phase tip
-    recommendations <- c(recommendations,
-                         "• New Moon and darker phases correlate with more sightings")
-    
-    # Time of day tip
-    recommendations <- c(recommendations,
-                         "• Dawn and dusk are peak sighting times")
-    
-  } else if(result$percentage < 0.1) {
-    recommendations <- c(recommendations,
-                         "• Your conditions are rare but have historical precedent",
-                         "• Consider adjusting season or location for better odds")
-  } else {
-    recommendations <- c(recommendations,
-                         "• Your conditions are excellent based on historical data!",
-                         "• Make sure to bring a camera",
-                         "• Stay alert during dawn and dusk hours")
-  }
+    div(
+      tags$h1(style = paste0("color: ", color, "; font-size: 72px; font-weight: bold; margin: 20px 0;"),
+              paste0(icon, " ", ifelse(index_value > 0, "+", ""), index_value)),
+      tags$p(style = "font-size: 24px; color: #e4e4e4; font-weight: bold;",
+             "Bigfoot Encounter Index"),
+      tags$p(style = "font-size: 18px; color: #e4e4e4;",
+             message),
+      tags$p(style = "font-size: 14px; color: #95a5a6; margin-top: 20px;",
+             paste0("Raw probability: ", result$raw_percentage, "% | Average: ", 
+                    result$average_prob, "%")),
+      tags$p(style = "font-size: 14px; color: #4ecdc4;",
+             paste0(result$count, " historical sightings matched your conditions"))
+    )
+  })
   
-  div(style = "color: #e4e4e4; font-size: 14px;",
-      HTML(paste(recommendations, collapse = "<br>")))
-})
+  # Index gauge visualization
+  output$probability_gauge <- renderPlot({
+    req(input$calculate_prob)
+    result <- matrix_probability_result()
+    
+    index_value <- result$encounter_index
+    
+    # Create gauge chart centered at 0
+    par(bg = "#1a1a1a", mar = c(2, 2, 2, 2))
+    
+    # Setup plot
+    plot(0, 0, type = "n", xlim = c(-120, 120), ylim = c(-20, 100),
+         axes = FALSE, xlab = "", ylab = "", asp = 1)
+    
+    # Draw background bar
+    rect(-100, 40, 100, 60, col = "#2c3e50", border = NA)
+    
+    # Draw center line (average)
+    segments(0, 35, 0, 65, col = "#f9ca24", lwd = 3, lty = 2)
+    
+    # Draw index bar
+    if(index_value >= 0) {
+      bar_color <- if(index_value < 25) "#f9ca24" else if(index_value < 75) "#26de81" else "#4ecdc4"
+      rect(0, 40, min(index_value, 100), 60, col = bar_color, border = NA)
+    } else {
+      bar_color <- if(index_value > -25) "#ff9f43" else if(index_value > -50) "#ff6b6b" else "#e74c3c"
+      rect(max(index_value, -100), 40, 0, 60, col = bar_color, border = NA)
+    }
+    
+    # Add labels
+    text(0, 75, "AVERAGE", col = "#f9ca24", cex = 1.2, font = 2)
+    text(-100, 20, "-100\nWorst", col = "#e74c3c", cex = 0.9)
+    text(0, 20, "0\nAverage", col = "#f9ca24", cex = 0.9)
+    text(100, 20, "+100\nBest", col = "#4ecdc4", cex = 0.9)
+    
+    # Add pointer
+    points(min(max(index_value, -100), 100), 50, pch = 25, cex = 3, 
+           col = "white", bg = "white")
+    
+  }, bg = "#1a1a1a")
+  
+  # Factor breakdown
+  output$factor_breakdown <- renderUI({
+    req(input$calculate_prob)
+    result <- matrix_probability_result()
+    
+    tagList(
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "State: "),
+          tags$span(style = "color: #e4e4e4;", input$pred_state)
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Season: "),
+          tags$span(style = "color: #e4e4e4;", input$pred_season)
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Temperature Range: "),
+          tags$span(style = "color: #e4e4e4;", result$bins$temp_bin)
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Moon Phase: "),
+          tags$span(style = "color: #e4e4e4;", result$bins$moon_bin)
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Time of Day: "),
+          tags$span(style = "color: #e4e4e4;", result$time_display)
+      ),
+      div(style = "margin: 10px 0;",
+          tags$strong(style = "color: #f9ca24;", "Visibility: "),
+          tags$span(style = "color: #e4e4e4;", result$bins$vis_bin)
+      ),
+      hr(),
+      div(style = "margin-top: 15px; padding: 15px; background-color: #1a1a1a; border-radius: 8px;",
+          tags$h4(style = "color: #4ecdc4; margin-top: 0;", "How to Read Your Index:"),
+          tags$p(style = "color: #e4e4e4; margin: 5px 0; font-size: 13px;",
+                 "• Index of 0 = Your conditions are exactly average"),
+          tags$p(style = "color: #e4e4e4; margin: 5px 0; font-size: 13px;",
+                 "• Positive values = Better than average (higher likelihood)"),
+          tags$p(style = "color: #e4e4e4; margin: 5px 0; font-size: 13px;",
+                 "• Negative values = Worse than average (lower likelihood)"),
+          tags$p(style = "color: #e4e4e4; margin: 5px 0; font-size: 13px;",
+                 paste0("• Index of ", ifelse(result$encounter_index > 0, "+", ""), 
+                        result$encounter_index, " means you're ", 
+                        abs(result$encounter_index), "% ", 
+                        ifelse(result$encounter_index > 0, "above", "below"), 
+                        " average"))
+      )
+    )
+  })
+  
+  # Recommendations
+  output$recommendations <- renderUI({
+    req(input$calculate_prob)
+    result <- matrix_probability_result()
+    matrix <- probability_matrix()
+    
+    recommendations <- list()
+    index_value <- result$encounter_index
+    
+    if(index_value < -50) {
+      # Poor conditions - give specific improvement tips
+      
+      # Best state overall
+      best_states <- matrix %>%
+        group_by(state) %>%
+        summarise(avg_prob = mean(percentage)) %>%
+        arrange(desc(avg_prob)) %>%
+        head(3)
+      
+      recommendations <- c(recommendations,
+                           paste0(" Top states: ", paste(best_states$state, collapse = ", ")))
+      
+      # Best season
+      best_season <- matrix %>%
+        filter(state == input$pred_state) %>%
+        group_by(season) %>%
+        summarise(avg_prob = mean(percentage)) %>%
+        arrange(desc(avg_prob)) %>%
+        head(1)
+      
+      recommendations <- c(recommendations,
+                           paste0("Best season in ", input$pred_state, ": ", best_season$season[1]))
+      
+      # Time tip
+      recommendations <- c(recommendations,
+                           "Prime times: Dawn (5-7am) and Dusk (5-7pm)")
+      
+    } else if(index_value < 0) {
+      recommendations <- c(recommendations,
+                           "Your conditions are below average",
+                           "Small adjustments could improve your index",
+                           "Try darker moon phases (New Moon)")
+    } else if(index_value < 50) {
+      recommendations <- c(recommendations,
+                           "Decent conditions - you're on the right track!",
+                           "Keep your camera ready",
+                           "Stay alert for unusual sounds")
+    } else {
+      recommendations <- c(recommendations,
+                           "Excellent! These are prime Bigfoot conditions!",
+                           "Definitely bring high-quality recording equipment",
+                           "Consider bringing witnesses",
+                           "Have a backup flashlight ready")
+    }
+    
+    div(style = "color: #e4e4e4; font-size: 14px; line-height: 1.8;",
+        HTML(paste(recommendations, collapse = "<br>")))
+  })
   # ============================================
   # Correlation tab graphs and text
   # ============================================
