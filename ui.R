@@ -529,7 +529,7 @@ tabPanel("Topographic Map",
 ),
 
 # BIGFOOT PROBABILITY PREDICTOR 
-tabPanel("Bigfoot Probability Predictor",
+tabPanel("Bigfoot Encounter Index",
          fluidPage(
            style = "padding: 40px 20px;",
            
@@ -619,6 +619,7 @@ tabPanel("Bigfoot Probability Predictor",
                         )
                     )
              )
+             
            ),
            
            # Educational Note
