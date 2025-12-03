@@ -619,6 +619,15 @@ tabPanel("Bigfoot Probability Predictor",
                         )
                     )
              )
+           ),
+           
+           # Educational Note
+           div(style = "background-color: #2c3e50; padding: 20px; border-radius: 12px; margin-top: 30px; text-align: center;",
+               tags$p(style = "font-size: 14px; color: #e4e4e4; font-style: italic; margin: 0;",
+                      "Note: This predictor uses a 6-dimensional matrix lookup of historical sighting data. 
+                      Percentages represent the exact proportion of all sightings that occurred under your specified conditions. 
+                      Results are for educational and entertainment purposes!")
+
            )
          )
 ),
