@@ -529,7 +529,6 @@ tabPanel("Topographic Map",
 ),
 
 # BIGFOOT PROBABILITY PREDICTOR 
-
 tabPanel("Bigfoot Probability Predictor",
          fluidPage(
            style = "padding: 40px 20px;",
@@ -556,8 +555,11 @@ tabPanel("Bigfoot Probability Predictor",
                                     choices = c("Spring", "Summer", "Fall", "Winter"),
                                     selected = "Summer"),
                         
-                        sliderInput("pred_temp", "Temperature (°F):",
-                                    min = 0, max = 100, value = 65, step = 5),
+                        selectInput("pred_temp", "Temperature Range:",
+                                    choices = c("0-10°F", "10-20°F", "20-30°F", "30-40°F",
+                                                "40-50°F", "50-60°F", "60-70°F", "70-80°F",
+                                                "80-90°F", "90-100°F"),
+                                    selected = "60-70°F"),
                         
                         sliderInput("pred_moon", "Moon Phase:",
                                     min = 0, max = 1, value = 0.5, step = 0.125,
@@ -576,8 +578,9 @@ tabPanel("Bigfoot Probability Predictor",
                                                 "Night (7pm-5am)" = "night"),
                                     selected = "dusk"),
                         
-                        sliderInput("pred_visibility", "Visibility (miles):",
-                                    min = 0, max = 20, value = 5, step = 1),
+                        selectInput("pred_visibility", "Visibility:",
+                                    choices = c("0-5 mi", "5-10 mi", "10-15 mi", "15-20 mi", "20+ mi"),
+                                    selected = "5-10 mi"),
                         
                         hr(),
                         
@@ -589,28 +592,31 @@ tabPanel("Bigfoot Probability Predictor",
              
              # Results Panel
              column(7,
-                    div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); min-height: 600px;",
-                        h3("Your Bigfoot Encounter Probability", style = "color: #f9ca24; text-align: center;"),
+                    div(style = "background-color: #2c3e50; padding: 30px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);",
                         
-                        # Probability Display
-                        div(style = "text-align: center; margin: 40px 0;",
+                        # Main probability display
+                        div(style = "text-align: center; margin-bottom: 30px;",
                             uiOutput("probability_display")
                         ),
                         
-                        # Gauge/Meter visualization
+                        # Gauge visualization
                         plotOutput("probability_gauge", height = "200px"),
                         
                         hr(),
                         
-                        # Breakdown by factor
-                        h4("Your Condition Profile:", style = "color: #ff6b6b; margin-top: 20px;"),
-                        uiOutput("factor_breakdown"),
+                        # Factor breakdown
+                        div(style = "margin-top: 20px;",
+                            h4("Your Selected Conditions", style = "color: #4ecdc4; margin-bottom: 15px;"),
+                            uiOutput("factor_breakdown")
+                        ),
                         
                         hr(),
                         
                         # Recommendations
-                        h4("Insights & Tips:", style = "color: #4ecdc4; margin-top: 20px;"),
-                        uiOutput("recommendations")
+                        div(style = "margin-top: 20px;",
+                            h4("Tips & Recommendations", style = "color: #4ecdc4; margin-bottom: 15px;"),
+                            uiOutput("recommendations")
+                        )
                     )
              )
            ),
@@ -621,9 +627,9 @@ tabPanel("Bigfoot Probability Predictor",
                       "Note: This predictor uses a 6-dimensional matrix lookup of historical sighting data. 
                       Percentages represent the exact proportion of all sightings that occurred under your specified conditions. 
                       Results are for educational and entertainment purposes!")
-               
+
            )
-         )#Fluid page end
+         )
 ),
 
   # ABOUT US

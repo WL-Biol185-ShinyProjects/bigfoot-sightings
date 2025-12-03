@@ -1143,35 +1143,10 @@ function(input, output, session) {
                       selected = states[1])
   })
   
-  # Helper function to convert user inputs to bins
-  user_inputs_to_bins <- function(temp, vis, moon) {
+  # Helper function - now accepts bin strings directly from dropdowns
+  user_inputs_to_bins <- function(temp_bin, vis_bin, moon) {
     
-    # Temperature bin
-    temp_bin <- case_when(
-      temp >= 0 & temp < 10 ~ "0-10°F",
-      temp >= 10 & temp < 20 ~ "10-20°F",
-      temp >= 20 & temp < 30 ~ "20-30°F",
-      temp >= 30 & temp < 40 ~ "30-40°F",
-      temp >= 40 & temp < 50 ~ "40-50°F",
-      temp >= 50 & temp < 60 ~ "50-60°F",
-      temp >= 60 & temp < 70 ~ "60-70°F",
-      temp >= 70 & temp < 80 ~ "70-80°F",
-      temp >= 80 & temp < 90 ~ "80-90°F",
-      temp >= 90 & temp <= 100 ~ "90-100°F",
-      TRUE ~ NA_character_
-    )
-    
-    # Visibility bin
-    vis_bin <- case_when(
-      vis >= 0 & vis < 5 ~ "0-5 mi",
-      vis >= 5 & vis < 10 ~ "5-10 mi",
-      vis >= 10 & vis < 15 ~ "10-15 mi",
-      vis >= 15 & vis < 20 ~ "15-20 mi",
-      vis >= 20 ~ "20+ mi",
-      TRUE ~ NA_character_
-    )
-    
-    # Moon phase bin
+    # Moon phase bin (still calculated from slider)
     moon_bin <- case_when(
       moon >= 0 & moon < 0.125 ~ "New Moon",
       moon >= 0.125 & moon < 0.25 ~ "Waxing Crescent",
@@ -1184,6 +1159,7 @@ function(input, output, session) {
       TRUE ~ NA_character_
     )
     
+    # temp_bin and vis_bin are already strings from dropdowns, just return them
     return(list(temp_bin = temp_bin, vis_bin = vis_bin, moon_bin = moon_bin))
   }
   
@@ -1193,7 +1169,7 @@ function(input, output, session) {
     matrix <- probability_matrix()
     avg_prob <- average_probability()
     
-    # Convert user inputs to bins
+    # Convert user inputs to bins (temp and vis are already bin strings from dropdowns)
     bins <- user_inputs_to_bins(input$pred_temp, input$pred_visibility, input$pred_moon)
     
     # Capitalize time input
@@ -1325,11 +1301,11 @@ function(input, output, session) {
       rect(max(index_value, -100), 40, 0, 60, col = bar_color, border = NA)
     }
     
-    # Add labels
-    text(0, 75, "AVERAGE", col = "#f9ca24", cex = 1.2, font = 2)
-    text(-100, 20, "-100\nWorst", col = "#e74c3c", cex = 0.9)
-    text(0, 20, "0\nAverage", col = "#f9ca24", cex = 0.9)
-    text(100, 20, "+100\nBest", col = "#4ecdc4", cex = 0.9)
+    # Add labels with larger font size
+    text(0, 75, "AVERAGE", col = "#f9ca24", cex = 1.5, font = 2)
+    text(-100, 20, "-100\nWorst", col = "#e74c3c", cex = 1.2)
+    text(0, 20, "0\nAverage", col = "#f9ca24", cex = 1.2)
+    text(100, 20, "+100\nBest", col = "#4ecdc4", cex = 1.2)
     
     # Add pointer
     points(min(max(index_value, -100), 100), 50, pch = 25, cex = 3, 
