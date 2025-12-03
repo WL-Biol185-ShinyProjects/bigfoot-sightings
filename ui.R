@@ -621,6 +621,7 @@ tabPanel("Bigfoot Probability Predictor",
                       "Note: This predictor uses a 6-dimensional matrix lookup of historical sighting data. 
                       Percentages represent the exact proportion of all sightings that occurred under your specified conditions. 
                       Results are for educational and entertainment purposes!")
+               
            )
          )#Fluid page end
 ),
